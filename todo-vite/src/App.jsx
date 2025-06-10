@@ -6,9 +6,10 @@ function App() {
   const [todos, setTodos] = useState([]);
   const [todoText, setTodoText] = useState("");
 
+  const [updateVal, setUpdateVal] = useState("");
   const [todoId, setTodoId] = useState();
   const [isUpdate, setIsUpdate] = useState(false);
-  const [updatingTodoText, setUpdatingTodoText] = useState("");
+  const [updatingTodo, setUpdatingTodo] = useState("");
 
   let handleVal = (e) => {
     setVal(e.target.value);
@@ -22,14 +23,14 @@ function App() {
   };
 
    let handleUpdateVal = (e) => {
-    setUpdatingTodoText(e.target.value);
+    setUpdateVal(e.target.value);
   };
 
   let handleSubmitUpdate = (e) => {
     e.preventDefault();
-    updatingTodoText.length != 0 && setUpdatingTodoText(updatingTodoText);
+    updateVal.length != 0 && setUpdatingTodo({text : updateVal});
 
-    setUpdatingTodoText("");
+    setUpdateVal("");
     setIsUpdate(false)
   };
 
@@ -75,7 +76,7 @@ function App() {
           {
             method: "PUT",
             headers: { "content-type": "application/json" },
-            body: JSON.stringify(todos),
+            body: JSON.stringify(updatingTodo),
           }
         );
 
@@ -93,6 +94,9 @@ function App() {
   }, [todoText, todoId]);
 
   console.log(todos, "ttt");
+  console.log(todoId, "todoId");
+
+  console.log([updatingTodo], "ww")
 
   return (
     <>
@@ -113,11 +117,11 @@ function App() {
           {todos?.map((item, index) => (
             <div key={item.id} className="todo-parent">
               <div>
-                {isUpdate && todoId == index ? (
+                {isUpdate && todoId == item.id ? (
                   <>
                     <input
                       type="text"
-                      value={val}
+                      value={updateVal}
                       onChange={(e) => handleUpdateVal(e)}
                     />
                     <input
