@@ -9,7 +9,7 @@ function App() {
   const [updateVal, setUpdateVal] = useState("");
   const [todoId, setTodoId] = useState();
   const [isUpdate, setIsUpdate] = useState(false);
-  const [updatingTodo, setUpdatingTodo] = useState("");
+  const [updatingTodo, setUpdatingTodo] = useState(null);
 
   let handleVal = (e) => {
     setVal(e.target.value);
@@ -22,16 +22,16 @@ function App() {
     setVal("");
   };
 
-   let handleUpdateVal = (e) => {
+  let handleUpdateVal = (e) => {
     setUpdateVal(e.target.value);
   };
 
   let handleSubmitUpdate = (e) => {
     e.preventDefault();
-    updateVal.length != 0 && setUpdatingTodo({text : updateVal});
+    updateVal.length != 0 && setUpdatingTodo({ text: updateVal });
 
     setUpdateVal("");
-    setIsUpdate(false)
+    setIsUpdate(false);
   };
 
   let handleId = (id) => {
@@ -51,7 +51,11 @@ function App() {
         let postTodo = await fetch(`http://localhost:3001/api/todos`, {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify([todoText, todos]),
+          // body: JSON.stringify([todoText, todos]),
+          body: JSON.stringify({
+            newTodo: todoText,
+            existingTodos: todos,
+          }),
         });
         try {
           let contentType = postTodo.headers.get("content-type");
@@ -71,8 +75,9 @@ function App() {
       };
 
       let updatingTodoValue = async () => {
+        console.log("triggered");
         let updateTodoVal = await fetch(
-          `http://localhost:3001/api/update/todos${todoId}`,
+          `http://localhost:3001/api/update/todos/${todoId}`,
           {
             method: "PUT",
             headers: { "content-type": "application/json" },
@@ -84,19 +89,18 @@ function App() {
         console.log(res, "update res");
       };
 
-      // gettingTodos();
+      console.log(updatingTodo, "updatingTodo");
       todoText.length != 0 && addingTodo();
+      updatingTodo?.length != 0 && updatingTodo != null
+        ? updatingTodoValue()
+        : "";
       setTodoText("");
-      // todoId?.length != 0 && updatingTodo()
     };
 
     handleTodos();
-  }, [todoText, todoId]);
+  }, [todoText, todoId, updatingTodo]);
 
-  console.log(todos, "ttt");
-  console.log(todoId, "todoId");
-
-  console.log([updatingTodo], "ww")
+  console.log(updatingTodo, "ww");
 
   return (
     <>

@@ -2,16 +2,11 @@ let http = require("http");
 let PORT = 3001;
 
 let server = http.createServer((req, res) => {
-  let devTodos = [
-    {
-      id: 0,
-      todoVal: "to office",
-    },
-    {
-      id: 1,
-      todoVal: "to namaz",
-    },
-  ];
+  let method = req.method;
+  let url = req.url;
+
+  console.log(method, "method");
+  console.log(url, "url");
 
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
@@ -26,43 +21,48 @@ let server = http.createServer((req, res) => {
 
     res.end();
     return;
-  }
-
-  if (req.method == "GET" && req.url == "/api/todos") {
-    res.writeHead(200, { "content-type": "application/json" });
-    res.write(JSON.stringify(devTodos));
-    res.end();
-  }
-
-  if (req.method == "POST" && req.url == "/api/todos") {
+  } else if (method == "POST" && url == "/api/todos") {
     let body;
     req.on("data", (chunk) => {
       body = String(chunk);
     });
 
     req.on("end", () => {
+      let parsed;
+      try {
+        parsed = JSON.parse(body);
+      } catch (err) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        return res.end(JSON.stringify({ error: "Invalid JSON" }));
+      }
 
-      body = JSON.parse(body);
-      let newTodo = body[0];
-      let existingTodos = body[1];
+      let { newTodo, existingTodos } = parsed;
 
       if (newTodo.length == 0) {
         res.writeHead(400, { "content-type": "text/html" });
-        res.end()
+        res.end();
       } else {
         res.writeHead(200, { "content-type": "application/json" });
-        let getLastId = existingTodos.length != 0 ? existingTodos.slice(-1)[0].id : 0;
+        let getLastId =
+          existingTodos.length != 0 ? existingTodos.slice(-1)[0].id : 0;
 
-        let mergedTodos = [...existingTodos, {id : ++getLastId, todoVal : newTodo}]
+        let mergedTodos = [
+          ...existingTodos,
+          { id: ++getLastId, todoVal: newTodo },
+        ];
         res.end(JSON.stringify(mergedTodos));
       }
     });
-  }
+  } else if (method == "PUT" && url.includes("update")) {
+    let urlParts = url.split("/");
+    let todoId = urlParts.pop();
+    console.log(todoId, "tttt");
 
-  if(req.method == "PUT" && req.url == "/api/update/todos"){
-    console.log("in update")
+    res.writeHead(200, { "content-type": "application/json" });
+  } else {
+    res.writeHead(404);
+    res.end("Not Found");
   }
-
 });
 
 server.listen(PORT, () => {
