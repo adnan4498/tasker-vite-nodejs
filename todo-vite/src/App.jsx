@@ -28,7 +28,7 @@ function App() {
 
   let handleSubmitUpdate = (e) => {
     e.preventDefault();
-    updateVal.length != 0 && setUpdatingTodo({ text: updateVal });
+    updateVal.length != 0 && setUpdatingTodo({ updatedText: updateVal , existingTodos : todos});
 
     setUpdateVal("");
     setIsUpdate(false);
@@ -75,7 +75,6 @@ function App() {
       };
 
       let updatingTodoValue = async () => {
-        console.log("triggered");
         let updateTodoVal = await fetch(
           `http://localhost:3003/api/update/todos/${todoId}`,
           {
@@ -84,12 +83,14 @@ function App() {
             body: JSON.stringify(updatingTodo),
           }
         );
-
         let res = await updateTodoVal.json();
-        console.log(res, "update res");
+        try {
+          setTodos(res)
+        } catch (error) {
+          console.log(error, "rrr")
+        }
       };
 
-      console.log(updatingTodo, "updatingTodo");
       todoText.length != 0 && addingTodo();
       updatingTodo?.length != 0 && updatingTodo != null
         ? updatingTodoValue()
@@ -100,7 +101,7 @@ function App() {
     handleTodos();
   }, [todoText, todoId, updatingTodo]);
 
-  console.log(updatingTodo, "ww");
+  console.log(todos, "ww");
 
   return (
     <>

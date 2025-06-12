@@ -19,8 +19,9 @@ let server = http.createServer((req, res) => {
 
       req.on("end", () => {
         try {
-          let parseBody = JSON.parse(body);
-          resolve(parseBody);
+          console.log(body, "bbbb")
+          let parsed = JSON.parse(body);
+          resolve(parsed);
         } catch (error) {
           reject(error);
         }
@@ -38,56 +39,50 @@ let server = http.createServer((req, res) => {
     res.end();
     return;
   } else if (method == "POST" && url == "/api/todos") {
-
-    // parsedJSONBody(req).then((body) => {
-    //   req.on("end", () => {
-    //     console.log(body, "body")
-    //     let parsed;
-    //     try {
-    //       parsed = body;
-    //     } catch (error) {
-    //       res.statusCode = 400;
-    //       res.end(error, "invalid JSON");
-    //     }
-
-    //     console.log(parsed, "ppp")
-    //     res.writeHead(200, {"content-type" : "application/json"})
-    //     res.end({parsed})
-    //   });
-    // });
-
     parsedJSONBody(req).then((body) => {
-      console.log(body, "bbb")
-    })
+      const { newTodo, existingTodos } = body;
 
-    // req.on("end", () => {
-    // let parsed;
-    // try {
-    //   parsed = JSON.parse(body);
-    // } catch (err) {
-    //   res.writeHead(400, { "Content-Type": "application/json" });
-    //   return res.end(JSON.stringify({ error: "Invalid JSON" }));
-    // }
-    // let { newTodo, existingTodos } = parsed;
-    // if (newTodo.length == 0) {
-    //   res.writeHead(400, { "content-type": "text/html" });
-    //   res.end();
-    // } else {
-    //   res.writeHead(200, { "content-type": "application/json" });
-    //   let getLastId =
-    //     existingTodos.length != 0 ? existingTodos.slice(-1)[0].id : 0;
-    //   let mergedTodos = [
-    //     ...existingTodos,
-    //     { id: ++getLastId, todoVal: newTodo },
-    //   ];
-    //   res.end(JSON.stringify(mergedTodos));
-    // }
-    // });
+      if (newTodo.length == 0) {
+        res.writeHead(400, { "content-type": "text/html" });
+        res.end();
+      } else {
+        res.writeHead(200, { "content-type": "application/json" });
+        let getLastId =
+          existingTodos.length != 0 ? existingTodos.slice(-1)[0].id : 0;
+        let mergedTodos = [
+          ...existingTodos,
+          { id: ++getLastId, todoVal: newTodo },
+        ];
+        res.end(JSON.stringify(mergedTodos));
+      }
+    });
   } else if (method == "PUT" && url.includes("update")) {
-    let urlParts = url.split("/");
-    let todoId = urlParts.pop();
+    parsedJSONBody(req).then((body) => {
+      const { updatedText, existingTodos } = body;
+      let todoId = url.split("/").pop();
 
-    res.writeHead(200, { "content-type": "application/json" });
+      try {
+        if (/[!@#$%^&*()]/.test(updatedText)) {
+          throw new Error("Invalid characters in updatedText");
+        }
+
+        const updatedTodos = existingTodos.map((item) => {
+          if (item.id == todoId) {
+            item.todoVal = updatedText;
+          }
+          return item;
+        });
+
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify(updatedTodos));
+      } catch (error) {
+        // res.writeHead(400, { "content-type": "application/json" });
+        // res.end(JSON.stringify({ error: error.message }));
+
+        res.statusCode = 400
+        res.end(error)
+      }
+    });
   } else {
     res.writeHead(404);
     res.end("Not Found");
