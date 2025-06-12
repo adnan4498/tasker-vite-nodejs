@@ -42,13 +42,13 @@ function App() {
   useEffect(() => {
     let handleTodos = async () => {
       let gettingTodos = async () => {
-        let getTodos = await fetch(`http://localhost:3001/api/todos`);
+        let getTodos = await fetch(`http://localhost:3003/api/todos`);
         let res = await getTodos.json();
         setTodos(res);
       };
 
       let addingTodo = async () => {
-        let postTodo = await fetch(`http://localhost:3001/api/todos`, {
+        let postTodo = await fetch(`http://localhost:3003/api/todos`, {
           method: "POST",
           headers: { "content-type": "application/json" },
           // body: JSON.stringify([todoText, todos]),
@@ -77,7 +77,7 @@ function App() {
       let updatingTodoValue = async () => {
         console.log("triggered");
         let updateTodoVal = await fetch(
-          `http://localhost:3001/api/update/todos/${todoId}`,
+          `http://localhost:3003/api/update/todos/${todoId}`,
           {
             method: "PUT",
             headers: { "content-type": "application/json" },

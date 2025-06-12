@@ -1,5 +1,5 @@
 let http = require("http");
-let PORT = 3001;
+let PORT = 3003;
 
 let server = http.createServer((req, res) => {
   let method = req.method;
@@ -12,6 +12,21 @@ let server = http.createServer((req, res) => {
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
+  let parsedJSONBody = function (req) {
+    return new Promise((resolve, reject) => {
+      let body = ""
+
+      req.on("data", (chunk) => {
+        body += String(chunk)
+      })
+
+      req.on("end", () => {
+        
+      })
+
+    });
+  };
+
   if (req.method == "OPTIONS") {
     res.writeHead(200, {
       "Access-Control-Allow-Origin": "*",
@@ -22,19 +37,22 @@ let server = http.createServer((req, res) => {
     res.end();
     return;
   } else if (method == "POST" && url == "/api/todos") {
-    let body;
-    req.on("data", (chunk) => {
-      body = String(chunk);
-    });
+    // let body;
+    // req.on("data", (chunk) => {
+    //   body = String(chunk);
+    // });
+
+    let parsed = parsedJSONBody(req);
+    console.log(parsed, "pppp ");
 
     req.on("end", () => {
-      let parsed;
-      try {
-        parsed = JSON.parse(body);
-      } catch (err) {
-        res.writeHead(400, { "Content-Type": "application/json" });
-        return res.end(JSON.stringify({ error: "Invalid JSON" }));
-      }
+      // let parsed;
+      // try {
+      //   parsed = JSON.parse(body);
+      // } catch (err) {
+      //   res.writeHead(400, { "Content-Type": "application/json" });
+      //   return res.end(JSON.stringify({ error: "Invalid JSON" }));
+      // }
 
       let { newTodo, existingTodos } = parsed;
 
