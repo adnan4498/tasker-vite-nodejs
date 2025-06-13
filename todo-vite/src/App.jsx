@@ -6,10 +6,13 @@ function App() {
   const [todos, setTodos] = useState([]);
   const [todoText, setTodoText] = useState("");
 
-  const [updateVal, setUpdateVal] = useState("");
+  const [updateInputVal, setUpdateInputVal] = useState("");
   const [todoId, setTodoId] = useState();
   const [isUpdate, setIsUpdate] = useState(false);
   const [updatingTodo, setUpdatingTodo] = useState(null);
+
+  const [deleteId, setDeleteId] = useState(null)
+  const [isDelete, setIsDelete] = useState(false)
 
   let handleVal = (e) => {
     setVal(e.target.value);
@@ -23,15 +26,14 @@ function App() {
   };
 
   let handleUpdateVal = (e) => {
-    setUpdateVal(e.target.value);
+    setUpdateInputVal(e.target.value);
   };
 
   let handleSubmitUpdate = (e) => {
     e.preventDefault();
-    updateVal.length != 0 &&
-      setUpdatingTodo({ updatedText: updateVal, existingTodos: todos });
+    updateInputVal.length != 0 && setUpdatingTodo(updateInputVal);
 
-    setUpdateVal("");
+    setUpdateInputVal("");
     setIsUpdate(false);
   };
 
@@ -39,6 +41,11 @@ function App() {
     setTodoId(id);
     setIsUpdate(true);
   };
+
+  let handleDelete = (id) => {
+    setDeleteId(id)
+    setIsDelete(true)
+  }
 
   useEffect(() => {
     let handleTodos = async () => {
@@ -77,15 +84,14 @@ function App() {
 
       let updatingTodoValue = async () => {
         let updateTodoVal = await fetch(
-          `http://localhost:3003/api/update/todos/${todoId}`,
+          `http://localhost:3003/api/todos/update/${todoId}`,
           {
             method: "PUT",
             headers: { "content-type": "application/json" },
-            // body: JSON.stringify(updatingTodo),
-            body: JSON.stringify([{
-              updatedText: updateVal,
+            body: JSON.stringify({
+              updatedText: updatingTodo,
               existingTodos: todos,
-            }]),
+            }),
           }
         );
 
@@ -101,15 +107,40 @@ function App() {
         }
       };
 
+      let deletingTodo = async () => {
+
+        let deleteTodo = fetch(`http://localhost:3003/api/todos/delete/${deleteId}`, 
+          {
+            headers : {"content-type" : "application/json"},
+            method : "DELETE",
+            body : JSON.stringify({
+              deleteId : deleteId,
+              existingTodos : todos
+            })
+          }
+        )
+
+        console.log(res, "dddd")
+        
+        try {
+          let res = await deleteTodo.json() // why this works outside but not inside
+          setTodos(res)
+        } catch (error) {
+          console.log(error, "err")
+        }
+        
+      }
+
       todoText.length != 0 && addingTodo();
-      updatingTodo?.length != 0 && updatingTodo != null
-        ? updatingTodoValue()
-        : "";
+      updatingTodo?.length != 0 && updatingTodo != null ? updatingTodoValue(): "";
+      isDelete && deletingTodo()
+
       setTodoText("");
+      setIsDelete(false)
     };
 
     handleTodos();
-  }, [todoText, todoId, updatingTodo]);
+  }, [todoText, todoId, updatingTodo, deleteId]);
 
   console.log(todos, "todos");
 
@@ -136,7 +167,7 @@ function App() {
                   <>
                     <input
                       type="text"
-                      value={updateVal}
+                      value={updateInputVal}
                       onChange={(e) => handleUpdateVal(e)}
                     />
                     <input
@@ -154,7 +185,7 @@ function App() {
                   <div className="update-btn" onClick={() => handleId(item.id)}>
                     update
                   </div>
-                  <div className="delete-btn">delete</div>
+                  <div className="delete-btn" onClick={() => handleDelete(item.id)}>delete</div>
                 </div>
               </div>
             </div>
