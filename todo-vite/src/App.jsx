@@ -28,7 +28,8 @@ function App() {
 
   let handleSubmitUpdate = (e) => {
     e.preventDefault();
-    updateVal.length != 0 && setUpdatingTodo({ updatedText: updateVal , existingTodos : todos});
+    updateVal.length != 0 &&
+      setUpdatingTodo({ updatedText: updateVal, existingTodos: todos });
 
     setUpdateVal("");
     setIsUpdate(false);
@@ -80,14 +81,23 @@ function App() {
           {
             method: "PUT",
             headers: { "content-type": "application/json" },
-            body: JSON.stringify(updatingTodo),
+            // body: JSON.stringify(updatingTodo),
+            body: JSON.stringify([{
+              updatedText: updateVal,
+              existingTodos: todos,
+            }]),
           }
         );
+
         let res = await updateTodoVal.json();
+
+        console.log(res, "ress");
+
         try {
-          setTodos(res)
+          if (!updateTodoVal.ok) throw new Error(res.error);
+          setTodos(res);
         } catch (error) {
-          console.log(error, "rrr")
+          alert(error);
         }
       };
 
@@ -101,7 +111,7 @@ function App() {
     handleTodos();
   }, [todoText, todoId, updatingTodo]);
 
-  console.log(todos, "ww");
+  console.log(todos, "todos");
 
   return (
     <>
