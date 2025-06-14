@@ -11,8 +11,8 @@ function App() {
   const [isUpdate, setIsUpdate] = useState(false);
   const [updatingTodo, setUpdatingTodo] = useState(null);
 
-  const [deleteId, setDeleteId] = useState(null)
-  const [isDelete, setIsDelete] = useState(false)
+  const [deleteId, setDeleteId] = useState(null);
+  const [isDelete, setIsDelete] = useState(false);
 
   let handleVal = (e) => {
     setVal(e.target.value);
@@ -43,9 +43,9 @@ function App() {
   };
 
   let handleDelete = (id) => {
-    setDeleteId(id)
-    setIsDelete(true)
-  }
+    setDeleteId(id);
+    setIsDelete(true);
+  };
 
   useEffect(() => {
     let handleTodos = async () => {
@@ -108,35 +108,37 @@ function App() {
       };
 
       let deletingTodo = async () => {
-
-        let deleteTodo = fetch(`http://localhost:3003/api/todos/delete/${deleteId}`, 
-          {
-            headers : {"content-type" : "application/json"},
-            method : "DELETE",
-            body : JSON.stringify({
-              deleteId : deleteId,
-              existingTodos : todos
-            })
-          }
-        )
-
-        console.log(res, "dddd")
-        
         try {
-          let res = await deleteTodo.json() // why this works outside but not inside
-          setTodos(res)
+          let deleteTodo = await fetch(
+            `http://localhost:3003/api/todos/delete/${deleteId}`,
+            {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                existingTodos: todos,
+              }),
+            }
+          );
+
+          if (!deleteTodo.ok) {
+            throw new Error(`Server error: ${deleteTodo.status}`);
+          }
+
+          let res = await deleteTodo.json();
+          setTodos(res);
         } catch (error) {
-          console.log(error, "err")
+          console.error("Failed to delete todo:", error);
         }
-        
-      }
+      };
 
       todoText.length != 0 && addingTodo();
-      updatingTodo?.length != 0 && updatingTodo != null ? updatingTodoValue(): "";
-      isDelete && deletingTodo()
+      updatingTodo?.length != 0 && updatingTodo != null
+        ? updatingTodoValue()
+        : "";
+      isDelete && deletingTodo();
 
       setTodoText("");
-      setIsDelete(false)
+      setIsDelete(false);
     };
 
     handleTodos();
@@ -185,7 +187,12 @@ function App() {
                   <div className="update-btn" onClick={() => handleId(item.id)}>
                     update
                   </div>
-                  <div className="delete-btn" onClick={() => handleDelete(item.id)}>delete</div>
+                  <div
+                    className="delete-btn"
+                    onClick={() => handleDelete(item.id)}
+                  >
+                    delete
+                  </div>
                 </div>
               </div>
             </div>

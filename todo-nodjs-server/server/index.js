@@ -19,7 +19,7 @@ let server = http.createServer((req, res) => {
 
       req.on("end", () => {
         try {
-          console.log(body, "bbbb")
+          console.log(body, "bbbb");
           let parsed = JSON.parse(body);
           resolve(parsed);
         } catch (error) {
@@ -79,8 +79,27 @@ let server = http.createServer((req, res) => {
         // res.writeHead(400, { "content-type": "application/json" });
         // res.end(JSON.stringify({ error: error.message }));
 
-        res.statusCode = 400
-        res.end(error)
+        res.statusCode = 400;
+        res.end(error);
+      }
+    });
+  } else if (method == "DELETE" && url.includes("delete")) {
+    parsedJSONBody(req).then((body) => {
+      try {
+        res.writeHead(200, { "content-type": "application/json" });
+
+        let getId = url.split("/").pop();
+        const { existingTodos } = body;
+        let removeDeletedTodo = existingTodos.filter(
+          (item) => item.id != getId
+        );
+
+        console.log(removeDeletedTodo, "removeDeletedTodo");
+
+        res.end(JSON.stringify(removeDeletedTodo));
+      } catch (error) {
+        res.writeHead(400, { "content-type": "application/json" });
+        res.end(JSON.stringify({ error: error }));
       }
     });
   } else {
