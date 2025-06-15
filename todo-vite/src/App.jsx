@@ -59,7 +59,6 @@ function App() {
         let postTodo = await fetch(`http://localhost:3003/api/todos`, {
           method: "POST",
           headers: { "content-type": "application/json" },
-          // body: JSON.stringify([todoText, todos]),
           body: JSON.stringify({
             newTodo: todoText,
             existingTodos: todos,
@@ -75,6 +74,7 @@ function App() {
             let res = await postTodo.json();
             if (res.length == 0)
               throw new Error(res.status, "error : no todo found");
+            console.log(res, "post todos");
             setTodos(res);
           }
         } catch (error) {
@@ -97,10 +97,9 @@ function App() {
 
         let res = await updateTodoVal.json();
 
-        console.log(res, "ress");
-
         try {
           if (!updateTodoVal.ok) throw new Error(res.error);
+          console.log(res, "update todos");
           setTodos(res);
         } catch (error) {
           alert(error);
@@ -138,13 +137,12 @@ function App() {
       isDelete && deletingTodo();
 
       setTodoText("");
+      setUpdatingTodo("")
       setIsDelete(false);
     };
 
     handleTodos();
   }, [todoText, todoId, updatingTodo, deleteId]);
-
-  console.log(todos, "todos");
 
   return (
     <>
