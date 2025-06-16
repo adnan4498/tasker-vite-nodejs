@@ -19,7 +19,6 @@ let server = http.createServer((req, res) => {
 
       req.on("end", () => {
         try {
-          console.log(body, "bbbb")
           let parsed = JSON.parse(body);
           resolve(parsed);
         } catch (error) {
@@ -59,6 +58,7 @@ let server = http.createServer((req, res) => {
   } else if (method == "PUT" && url.includes("update")) {
     parsedJSONBody(req).then((body) => {
       const { updatedText, existingTodos } = body;
+
       let todoId = url.split("/").pop();
 
       try {
@@ -76,11 +76,27 @@ let server = http.createServer((req, res) => {
         res.writeHead(200, { "content-type": "application/json" });
         res.end(JSON.stringify(updatedTodos));
       } catch (error) {
-        // res.writeHead(400, { "content-type": "application/json" });
-        // res.end(JSON.stringify({ error: error.message }));
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.write(JSON.stringify({ error: error.message || "Unknown error" }));
+        res.end();
+      }
+    });
+  } else if (method == "DELETE" && url.includes("delete")) {
+    parsedJSONBody(req).then((body) => {
+      console.log(body, "bbbb");
 
-        res.statusCode = 400
-        res.end(error)
+      const { deleteId, existingTodos } = body;
+
+      try {
+        let removeDeleted = existingTodos.filter((item) => item.id != deleteId);
+
+        console.log(removeDeleted, "removeDeleted")
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify(removeDeleted));
+
+      } catch (error) {
+        res.writeHead(400, { "content-type": "application/json" });
+        res.end(JSON.stringify({ error: error }));
       }
     });
   } else {
