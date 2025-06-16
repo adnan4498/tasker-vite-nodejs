@@ -1,104 +1,98 @@
-let http = require("http");
-let PORT = 3003;
+const http = require("http");
+const PORT = 3003;
 
-let server = http.createServer((req, res) => {
-  let method = req.method;
-  let url = req.url;
+function parsedJSONBody(req) {
+  return new Promise((resolve, reject) => {
+    let body = "";
+    req.on("data", (chunk) => {
+      body += String(chunk);
+    });
+    req.on("end", () => {
+      try {
+        const parsed = JSON.parse(body);
+        resolve(parsed);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  });
+}
+
+const server = http.createServer((req, res) => {
+  const method = req.method;
+  const url = req.url;
 
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  let parsedJSONBody = function (req) {
-    return new Promise((resolve, reject) => {
-      let body = "";
+  if (method === "OPTIONS") {
+    res.writeHead(200);
+    return res.end();
+  }
 
-      req.on("data", (chunk) => {
-        body += String(chunk);
-      });
-
-      req.on("end", () => {
-        try {
-          let parsed = JSON.parse(body);
-          resolve(parsed);
-        } catch (error) {
-          reject(error);
+  if (method === "POST" && url === "/api/todos") {
+    parsedJSONBody(req)
+      .then(({ newTodo, existingTodos }) => {
+        if (!newTodo || newTodo.length === 0) {
+          res.writeHead(400);
+          return res.end();
         }
-      });
-    });
-  };
-
-  if (req.method == "OPTIONS") {
-    res.writeHead(200, {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-    });
-
-    res.end();
-    return;
-  } else if (method == "POST" && url == "/api/todos") {
-    parsedJSONBody(req).then((body) => {
-      const { newTodo, existingTodos } = body;
-
-      if (newTodo.length == 0) {
-        res.writeHead(400, { "content-type": "text/html" });
-        res.end();
-      } else {
-        res.writeHead(200, { "content-type": "application/json" });
-        let getLastId =
-          existingTodos.length != 0 ? existingTodos.slice(-1)[0].id : 0;
-        let mergedTodos = [
+        const lastId = existingTodos.length ? existingTodos.slice(-1)[0].id : 0;
+        const newTodos = [
           ...existingTodos,
-          { id: ++getLastId, todoVal: newTodo },
+          { id: lastId + 1, todoVal: newTodo },
         ];
-        res.end(JSON.stringify(mergedTodos));
-      }
-    });
-  } else if (method == "PUT" && url.includes("update")) {
-    parsedJSONBody(req).then((body) => {
-      const { updatedText, existingTodos } = body;
-
-      let todoId = url.split("/").pop();
-
-      try {
-        if (/[!@#$%^&*()]/.test(updatedText)) {
-          throw new Error("Invalid characters in updatedText");
+        console.log(newTodos, "newTodos")
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(newTodos));
+      })
+      .catch(() => {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: "Malformed JSON" }));
+      });
+  } else if (method === "PUT" && url.includes("update")) {
+    parsedJSONBody(req)
+      .then(({ updatedText, existingTodos }) => {
+        const todoId = url.split("/").pop();
+        if (!updatedText || /[!@#$%^&*()]/.test(updatedText)) {
+          res.writeHead(400);
+          return res.end(
+            JSON.stringify({ error: "Invalid characters in updatedText" })
+          );
         }
-
         const updatedTodos = existingTodos.map((item) => {
-          if (item.id == todoId) {
-            item.todoVal = updatedText;
-          }
+          if (item.id == todoId) item.todoVal = updatedText;
           return item;
         });
-
-        res.writeHead(200, { "content-type": "application/json" });
+        console.log(updatedTodos, "updatedTodos")
+        res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify(updatedTodos));
-      } catch (error) {
-        res.writeHead(400, { "Content-Type": "application/json" });
-        res.write(JSON.stringify({ error: error.message || "Unknown error" }));
-        res.end();
-      }
-    });
-  } else if (method == "DELETE" && url.includes("delete")) {
-    parsedJSONBody(req).then((body) => {
-      console.log(body, "bbbb");
-
-      const { deleteId, existingTodos } = body;
-
-      try {
-        let removeDeleted = existingTodos.filter((item) => item.id != deleteId);
-
-        console.log(removeDeleted, "removeDeleted")
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify(removeDeleted));
-
-      } catch (error) {
-        res.writeHead(400, { "content-type": "application/json" });
-        res.end(JSON.stringify({ error: error }));
-      }
-    });
+      })
+      .catch(() => {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: "Malformed JSON" }));
+      });
+  } 
+  
+  else if (method === "DELETE" && url.includes("delete")) {
+    parsedJSONBody(req)
+      .then(({ existingTodos }) => {
+        const getId = url.split("/").pop();
+        if (!Array.isArray(existingTodos)) {
+          res.writeHead(400);
+          return res.end(
+            JSON.stringify({ error: "existingTodos must be an array" })
+          );
+        }
+        const remaining = existingTodos.filter((item) => item.id != getId);
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(remaining));
+      })
+      .catch(() => {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: "Malformed JSON" }));
+      });
   } else {
     res.writeHead(404);
     res.end("Not Found");
@@ -106,5 +100,5 @@ let server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log("server is running");
+  console.log(`Server is running on port ${PORT}`);
 });

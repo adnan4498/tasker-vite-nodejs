@@ -1,3 +1,51 @@
-.todo-parent{
+.todo-parent {
   background-color: lightblue;
+}
+
+/* Login Styles */
+
+.login-div {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #252626;
+}
+
+.login-form {
+  background: white;
+  padding: 2rem 3rem;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+}
+
+.login-form h2 {
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #333;
+}
+
+.login-form input {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.login-form button {
+  padding: 0.75rem;
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.login-form button:hover {
+  background-color: #0056b3;
 }
