@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
+  const [triggerSignUpApi, setTriggerSignUpApi] = useState(false);
+  const [signUpData, setSignUpData] = useState({
     name: "",
     email: "",
     password: "",
@@ -10,23 +11,29 @@ const Signup = () => {
   });
 
   useEffect(() => {
-    let toSingup = fetch("http://localhost:3003/signup", {
-        headers : {"content-type" : "application/json"},
-        method 
-    })
-  }, [])
+    let handleSignUpApi = async () => {
+      let toSingup = await fetch("http://localhost:3003/signup", {
+        headers: { "content-type": "application/json" },
+        method: "POST",
+        body: JSON.stringify(signUpData),
+      });
+      let res = await toSingup.json();
+      console.log(res, "res")
+    };
+
+    triggerSignUpApi && handleSignUpApi();
+    setTriggerSignUpApi(false);
+  }, [signUpData, triggerSignUpApi]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setSignUpData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
+    setTriggerSignUpApi(true);
   };
-
-  console.log(formData, "formData");
 
   return (
     <div className="login-div">
@@ -36,15 +43,15 @@ const Signup = () => {
           type="text"
           name="name"
           placeholder="Name"
-          value={formData.name}
+          value={signUpData.name}
           onChange={handleChange}
-          required
+          // required
         />
         <input
           type="email"
           name="email"
           placeholder="Email"
-          value={formData.email}
+          value={signUpData.email}
           onChange={handleChange}
           required
         />
@@ -52,7 +59,7 @@ const Signup = () => {
           type={showPassword ? "text" : "password"}
           name="password"
           placeholder="Password"
-          value={formData.password}
+          value={signUpData.password}
           onChange={handleChange}
           required
         />
@@ -60,7 +67,7 @@ const Signup = () => {
           type={showPassword ? "text" : "password"}
           name="confirmPassword"
           placeholder="Confirm Password"
-          value={formData.confirmPassword}
+          value={signUpData.confirmPassword}
           onChange={handleChange}
           required
         />
