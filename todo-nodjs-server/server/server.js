@@ -1,30 +1,18 @@
-const http = require("http");
-const { auth } = require("./routes/auth");
-const PORT = 3003;
+import http from "http"
+import { auth } from "./routes/auth.js";
+import { parsedJSONBody } from "./utils/parseJSON.js";
 
-function parsedJSONBody(req) {
-  return new Promise((resolve, reject) => {
-    let body = "";
-    req.on("data", (chunk) => {
-      body += String(chunk);
-    });
-    req.on("end", () => {
-      try {
-        const parsed = JSON.parse(body);
-        resolve(parsed);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  });
-}
+const PORT = 3003;
 
 const server = http.createServer((req, res) => {
   const method = req.method;
   const url = req.url;
 
+  console.log(url, "url")
+  console.log(method, "method")
+
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS,LOGIN,SIGNUP");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (method === "OPTIONS") {
@@ -92,9 +80,18 @@ const server = http.createServer((req, res) => {
         res.writeHead(400);
         res.end(JSON.stringify({ error: "Malformed JSON" }));
       });
-  } else if (method == "SIGNUP" || url.includes("signup")) {
-    auth(req)
-  } else {
+  } 
+    else if(method === "POST" && url.includes("signup")){
+
+      let aaa = async function () {
+        let getAuth =  await auth(req, res)
+        res.end(getAuth)
+      }
+
+      aaa()
+
+    }
+  else {
     res.writeHead(404);
     res.end("Not Found");
   }
@@ -103,3 +100,4 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
