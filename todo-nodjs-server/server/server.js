@@ -1,6 +1,6 @@
 import http from "http";
-import { auth } from "./routes/auth.js";
-import { parsedJSONBody } from "./utils/parseJSON.js";
+import { auth } from "../routes/auth.js";
+import { parsedJSONBody } from "../utils/parseJSON.js";
 import mongoose from "mongoose";
 
 const PORT = 3003;
