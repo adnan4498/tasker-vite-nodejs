@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [triggerSignUpApi, setTriggerSignUpApi] = useState(false);
+
+  const location = useLocation();
+  const email = location.state?.email;
+
   const [loginData, setLoginData] = useState({
-    name: "",
-    email: "",
+    email: email || "",
     password: "",
-    confirmPassword: "",
   });
+
+  const [loginResponse, setLoginResponse] = useState();
+  const navigate = useNavigate();
 
   useEffect(() => {
     let handleSignUpApi = async () => {
@@ -17,13 +23,21 @@ const Login = () => {
         method: "POST",
         body: JSON.stringify(loginData),
       });
+      console.log(loginUser, "loginUser");
       let res = await loginUser.json();
+      setLoginResponse(res);
       console.log(res, "res");
     };
 
     triggerSignUpApi && handleSignUpApi();
     setTriggerSignUpApi(false);
   }, [loginData, triggerSignUpApi]);
+
+  useEffect(() => {
+    if (loginResponse?.status == 200) {
+      navigate("/home");
+    }
+  }, [loginResponse]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,6 +69,11 @@ const Login = () => {
           onChange={handleChange}
           required
         />
+           {loginResponse?.incorrectPassword && (
+            <p style={{ color: "red", fontSize: "0.9rem", marginTop: "4px" }}>
+              {loginResponse?.incorrectPassword}
+            </p>
+          )}
         <label style={{ marginBottom: "1rem" }}>
           <input
             type="checkbox"

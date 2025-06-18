@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -9,21 +10,39 @@ const Signup = () => {
     password: "",
     confirmPassword: "",
   });
+  const [signUpMsg, setSignUpMsg] = useState();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     let handleSignUpApi = async () => {
-      let toSingup = await fetch("http://localhost:3003/signup", {
-        headers: { "content-type": "application/json" },
-        method: "POST",
-        body: JSON.stringify(signUpData),
-      });
-      let res = await toSingup.json();
-      console.log(res, "res")
+      try {
+        let toSingup = await fetch("http://localhost:3003/signup", {
+          headers: { "content-type": "application/json" },
+          method: "POST",
+          body: JSON.stringify(signUpData),
+        });
+
+        let res = await toSingup.json();
+        setSignUpMsg(res);
+      } catch (error) {
+        console.log(error);
+      }
     };
 
     triggerSignUpApi && handleSignUpApi();
     setTriggerSignUpApi(false);
   }, [signUpData, triggerSignUpApi]);
+
+  useEffect(() => {
+    if (signUpMsg?.success) {
+      setTimeout(() => {
+        navigate("/login", {
+          state: { email: signUpData.email },
+        });
+      }, 1000);
+    }
+  }, [signUpMsg]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,14 +66,28 @@ const Signup = () => {
           onChange={handleChange}
           // required
         />
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={signUpData.email}
-          onChange={handleChange}
-          required
-        />
+        <div>
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={signUpData.email}
+            onChange={handleChange}
+            required
+            style={{
+              borderColor: signUpMsg?.error ? "red" : "#ccc",
+              borderWidth: "1px",
+              borderStyle: "solid",
+              width: "92%",
+            }}
+          />
+          {signUpMsg?.error && (
+            <p style={{ color: "red", fontSize: "0.9rem", marginTop: "4px" }}>
+              {signUpMsg?.error}
+            </p>
+          )}
+        </div>
+
         <input
           type={showPassword ? "text" : "password"}
           name="password"
@@ -79,7 +112,12 @@ const Signup = () => {
           />{" "}
           Show Password
         </label>
-        <button type="submit">Sing up</button>
+        <button
+          type="submit"
+          style={{ background: signUpMsg?.success && "green" }}
+        >
+          Sign up
+        </button>
       </form>
     </div>
   );

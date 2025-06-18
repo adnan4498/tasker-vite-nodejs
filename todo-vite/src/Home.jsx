@@ -56,19 +56,19 @@ function Home() {
       };
 
       let addingTodo = async () => {
-        let postTodo = await fetch(`http://localhost:3003/api/todos`, {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            newTodo: todoText,
-            existingTodos: todos,
-          }),
-        });
         try {
+          let postTodo = await fetch(`http://localhost:3003/api/todos`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              newTodo: todoText,
+              existingTodos: todos,
+            }),
+          });
           let contentType = postTodo.headers.get("content-type");
           if (contentType == "text/html") {
             let serverText = await postTodo.text();
-            if (postTodo.status == 400)
+            if (!postTodo.ok)
               throw new Error(`${postTodo.status} ${serverText}`);
           } else {
             let res = await postTodo.json();
@@ -83,26 +83,24 @@ function Home() {
       };
 
       let updatingTodoValue = async () => {
-        let updateTodoVal = await fetch(
-          `http://localhost:3003/api/todos/update/${todoId}`,
-          {
-            method: "PUT",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-              updatedText: updatingTodo,
-              existingTodos: todos,
-            }),
-          }
-        );
-
-        let res = await updateTodoVal.json();
-
         try {
-          if (!updateTodoVal.ok) throw new Error(res.error);
-          console.log(res, "update todos");
+          let updateTodoVal = await fetch(
+            `http://localhost:3003/api/todos/update/${todoId}`,
+            {
+              method: "PUT",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({
+                updatedText: updatingTodo,
+                existingTodos: todos,
+              }),
+            }
+          );
+
+          let res = await updateTodoVal.json();
+          if (!updateTodoVal.ok) throw new Error(res.error || "Update failed");
           setTodos(res);
         } catch (error) {
-          alert(error);
+          alert(error.message || "Something went wrong");
         }
       };
 
@@ -129,15 +127,13 @@ function Home() {
           console.error("Failed to delete todo:", error);
         }
       };
-
-      todoText.length != 0 && addingTodo();
-      updatingTodo?.length != 0 && updatingTodo != null
-        ? updatingTodoValue()
-        : "";
-      isDelete && deletingTodo();
+      
+      if (todoText) await addingTodo();
+      if (updatingTodo) await updatingTodoValue();
+      if (isDelete) await deletingTodo();
 
       setTodoText("");
-      setUpdatingTodo("")
+      setUpdatingTodo("");
       setIsDelete(false);
     };
 
