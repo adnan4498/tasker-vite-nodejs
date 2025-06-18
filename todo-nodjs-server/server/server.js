@@ -96,7 +96,16 @@ const server = http.createServer((req, res) => {
       res.writeHead(400, { "content-type": "application/json" });
       return res.end(JSON.stringify({ error: error }));
     }
-  } else {
+  }
+    else if (method === "POST" && url.includes("login")) {
+    try {
+      auth(req, res);
+    } catch (error) {
+      res.writeHead(400, { "content-type": "application/json" });
+      return res.end(JSON.stringify({ error: error }));
+    }
+  }
+  else {
     res.writeHead(404);
     res.end("Not Found");
   }

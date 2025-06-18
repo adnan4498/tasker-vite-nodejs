@@ -9,3 +9,4 @@ mongoose.connect("mongodb://127.0.0.1:27017/signup_demo").then(async () => {
     console.log(error)
     process.exit(1)
 })
+ 
