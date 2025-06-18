@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 
-const Signup = () => {
+const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [triggerSignUpApi, setTriggerSignUpApi] = useState(false);
-  const [signUpData, setSignUpData] = useState({
+  const [loginData, setLoginData] = useState({
     name: "",
     email: "",
     password: "",
@@ -12,22 +12,22 @@ const Signup = () => {
 
   useEffect(() => {
     let handleSignUpApi = async () => {
-      let toSingup = await fetch("http://localhost:3003/signup", {
+      let loginUser = await fetch("http://localhost:3003/login", {
         headers: { "content-type": "application/json" },
         method: "POST",
-        body: JSON.stringify(signUpData),
+        body: JSON.stringify(loginData),
       });
-      let res = await toSingup.json();
-      console.log(res, "res")
+      let res = await loginUser.json();
+      console.log(res, "res");
     };
 
     triggerSignUpApi && handleSignUpApi();
     setTriggerSignUpApi(false);
-  }, [signUpData, triggerSignUpApi]);
+  }, [loginData, triggerSignUpApi]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setSignUpData((prev) => ({ ...prev, [name]: value }));
+    setLoginData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
@@ -38,20 +38,12 @@ const Signup = () => {
   return (
     <div className="login-div">
       <form onSubmit={handleSubmit} className="login-form">
-        <h2>Signup</h2>
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          value={signUpData.name}
-          onChange={handleChange}
-          // required
-        />
+        <h2>Login</h2>
         <input
           type="email"
           name="email"
           placeholder="Email"
-          value={signUpData.email}
+          value={loginData.email}
           onChange={handleChange}
           required
         />
@@ -59,15 +51,7 @@ const Signup = () => {
           type={showPassword ? "text" : "password"}
           name="password"
           placeholder="Password"
-          value={signUpData.password}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type={showPassword ? "text" : "password"}
-          name="confirmPassword"
-          placeholder="Confirm Password"
-          value={signUpData.confirmPassword}
+          value={loginData.password}
           onChange={handleChange}
           required
         />
@@ -79,10 +63,10 @@ const Signup = () => {
           />{" "}
           Show Password
         </label>
-        <button type="submit">Sing up</button>
+        <button type="submit">Login</button>
       </form>
     </div>
   );
 };
 
-export default Signup;
+export default Login;
