@@ -5,34 +5,30 @@ function Home() {
   const [val, setVal] = useState("");
   const [todos, setTodos] = useState([]);
   const [todoText, setTodoText] = useState("");
-
   const [updateInputVal, setUpdateInputVal] = useState("");
   const [todoId, setTodoId] = useState();
   const [isUpdate, setIsUpdate] = useState(false);
   const [updatingTodo, setUpdatingTodo] = useState(null);
-
   const [deleteId, setDeleteId] = useState(null);
   const [isDelete, setIsDelete] = useState(false);
 
-  let handleVal = (e) => {
-    setVal(e.target.value);
-  };
+  const [userProfile, setUserProfile] = useState({
+    name: "John Doe",
+    avatar: "https://i.pravatar.cc/50?img=12",
+  });
+
+  let handleVal = (e) => setVal(e.target.value);
+  let handleUpdateVal = (e) => setUpdateInputVal(e.target.value);
 
   let handleSubmit = (e) => {
     e.preventDefault();
-    val.length != 0 && setTodoText(val);
-
+    if (val.length !== 0) setTodoText(val);
     setVal("");
-  };
-
-  let handleUpdateVal = (e) => {
-    setUpdateInputVal(e.target.value);
   };
 
   let handleSubmitUpdate = (e) => {
     e.preventDefault();
-    updateInputVal.length != 0 && setUpdatingTodo(updateInputVal);
-
+    if (updateInputVal.length !== 0) setUpdatingTodo(updateInputVal);
     setUpdateInputVal("");
     setIsUpdate(false);
   };
@@ -60,21 +56,17 @@ function Home() {
           let postTodo = await fetch(`http://localhost:3003/api/todos`, {
             method: "POST",
             headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-              newTodo: todoText,
-              existingTodos: todos,
-            }),
+            body: JSON.stringify({ newTodo: todoText, existingTodos: todos }),
           });
+
           let contentType = postTodo.headers.get("content-type");
-          if (contentType == "text/html") {
+          if (contentType === "text/html") {
             let serverText = await postTodo.text();
             if (!postTodo.ok)
               throw new Error(`${postTodo.status} ${serverText}`);
           } else {
             let res = await postTodo.json();
-            if (res.length == 0)
-              throw new Error(res.status, "error : no todo found");
-            console.log(res, "post todos");
+            if (res.length === 0) throw new Error("No todos returned");
             setTodos(res);
           }
         } catch (error) {
@@ -111,15 +103,12 @@ function Home() {
             {
               method: "DELETE",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                existingTodos: todos,
-              }),
+              body: JSON.stringify({ existingTodos: todos }),
             }
           );
 
-          if (!deleteTodo.ok) {
+          if (!deleteTodo.ok)
             throw new Error(`Server error: ${deleteTodo.status}`);
-          }
 
           let res = await deleteTodo.json();
           setTodos(res);
@@ -127,7 +116,7 @@ function Home() {
           console.error("Failed to delete todo:", error);
         }
       };
-      
+
       if (todoText) await addingTodo();
       if (updatingTodo) await updatingTodoValue();
       if (isDelete) await deletingTodo();
@@ -143,33 +132,42 @@ function Home() {
   return (
     <>
       <div className="main-container">
+        <div className="navbar">
+          <div className="hello">Hello</div>
+
+          <div className="user-profile">
+            <img
+              src={userProfile.avatar}
+              alt="profile"
+              className="profile-pic"
+            />
+            <span className="profile-name">{userProfile.name}</span>
+          </div>
+        </div>
+
         <div className="add-new-todo">
           <form>
             <label className="new-todo">New Todo</label>
-            <input type="text" value={val} onChange={(e) => handleVal(e)} />
-            <input
-              type="submit"
-              value="Submit"
-              onClick={(e) => handleSubmit(e)}
-            />
+            <input type="text" value={val} onChange={handleVal} />
+            <input type="submit" value="Submit" onClick={handleSubmit} />
           </form>
         </div>
 
         <div className="todo-container">
-          {todos?.map((item, index) => (
+          {todos?.map((item) => (
             <div key={item.id} className="todo-parent">
               <div>
-                {isUpdate && todoId == item.id ? (
+                {isUpdate && todoId === item.id ? (
                   <>
                     <input
                       type="text"
                       value={updateInputVal}
-                      onChange={(e) => handleUpdateVal(e)}
+                      onChange={handleUpdateVal}
                     />
                     <input
                       type="submit"
                       value="Submit"
-                      onClick={(e) => handleSubmitUpdate(e)}
+                      onClick={handleSubmitUpdate}
                     />
                   </>
                 ) : (

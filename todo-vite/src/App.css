@@ -120,3 +120,36 @@
   background-color: #059669;
   transform: translateY(-2px);
 }
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  margin-bottom: 16px;
+}
+
+.profile-pic {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+}
+
+.hello{
+  font-size: 25px;
+  color: white;
+}
+
+.navbar{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px 20px 30px 20px;
+}
