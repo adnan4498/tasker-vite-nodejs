@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useRef } from "react";
 
 function Home() {
   const [val, setVal] = useState("");
@@ -12,13 +14,18 @@ function Home() {
   const [deleteId, setDeleteId] = useState(null);
   const [isDelete, setIsDelete] = useState(false);
 
-  const [userProfile, setUserProfile] = useState({
-    name: "John Doe",
-    avatar: "https://i.pravatar.cc/50?img=12",
-  });
+  // const [userProfile, setUserProfile] = useState({
+  //   name: "John Doe",
+  //   avatar: "https://i.pravatar.cc/50?img=12",
+  // });
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef();
 
-  let handleVal = (e) => setVal(e.target.value);
-  let handleUpdateVal = (e) => setUpdateInputVal(e.target.value);
+  const navigate = useNavigate();
+  const location = useLocation();
+  let userInfo = location.state?.userInfo;
+
+  console.log(userInfo, "user info");
 
   let handleSubmit = (e) => {
     e.preventDefault();
@@ -129,19 +136,53 @@ function Home() {
     handleTodos();
   }, [todoText, todoId, updatingTodo, deleteId]);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  let handleVal = (e) => setVal(e.target.value);
+  let handleUpdateVal = (e) => setUpdateInputVal(e.target.value);
+
+  useEffect(() => {
+    
+  }, [])
+  
+
   return (
     <>
       <div className="main-container">
         <div className="navbar">
           <div className="hello">Hello</div>
 
-          <div className="user-profile">
-            <img
-              src={userProfile.avatar}
-              alt="profile"
-              className="profile-pic"
-            />
-            <span className="profile-name">{userProfile.name}</span>
+          <div className="user-profile-container" ref={dropdownRef}>
+            <div
+              className="user-profile"
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+            >
+              <span className="profile-name">{userInfo.user.name}</span>
+              <img
+                src="https://i.pravatar.cc/50?img=12"
+                alt="profile"
+                className="profile-pic"
+              />
+            </div>
+            {dropdownOpen && (
+              <div className="dropdown-menu">
+                <div
+                  className="dropdown-item"
+                  onClick={() => navigate("/settings")}
+                >
+                  Settings
+                </div>
+                <div className="dropdown-item">Logout</div>
+              </div>
+            )}
           </div>
         </div>
 

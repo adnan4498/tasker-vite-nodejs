@@ -26,7 +26,6 @@ const Login = () => {
       console.log(loginUser, "loginUser");
       let res = await loginUser.json();
       setLoginResponse(res);
-      console.log(res, "res");
     };
 
     triggerSignUpApi && handleSignUpApi();
@@ -35,7 +34,9 @@ const Login = () => {
 
   useEffect(() => {
     if (loginResponse?.status == 200) {
-      navigate("/home");
+      navigate("/home", {
+        state : { userInfo : loginResponse }
+      });
     }
   }, [loginResponse]);
 
