@@ -42,10 +42,13 @@ export const auth = async function (req, res) {
       }
 
       let token = jwt.sign({ userId: findUser._id }, process.env.JWT_SECRET, {
-        expiresIn : "1h",
+        expiresIn : "12h",
       })
 
+      console.log(findUser, "findUser")
+
       let loggedInUserData = {
+        id : findUser._id,
         name: findUser.name,
         email: email,
       };
