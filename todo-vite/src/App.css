@@ -253,6 +253,7 @@
   justify-content: space-between;
   border-bottom: 1px solid #e6e6e6;
   padding-bottom: 8px;
+  cursor: pointer;
 }
 
 .settings-item label {
@@ -262,4 +263,8 @@
 
 .settings-item span {
   color: #111;
+}
+
+.edit-email{
+  color: orange !important;
 }

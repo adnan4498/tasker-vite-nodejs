@@ -14,16 +14,16 @@ function Home() {
   const [deleteId, setDeleteId] = useState(null);
   const [isDelete, setIsDelete] = useState(false);
 
-  // const [userProfile, setUserProfile] = useState({
-  //   name: "John Doe",
-  //   avatar: "https://i.pravatar.cc/50?img=12",
-  // });
+  const [triggerSettingsRoute, setTriggerSettingsRoute] = useState();
+
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef();
 
   const navigate = useNavigate();
   const location = useLocation();
   let userInfo = location.state?.userInfo;
+
+  let token = userInfo.token;
 
   let handleSubmit = (e) => {
     e.preventDefault();
@@ -48,6 +48,7 @@ function Home() {
     setIsDelete(true);
   };
 
+  // Crud operations
   useEffect(() => {
     let handleTodos = async () => {
       let gettingTodos = async () => {
@@ -134,6 +135,41 @@ function Home() {
     handleTodos();
   }, [todoText, todoId, updatingTodo, deleteId]);
 
+  const [settingResponse , setSettingResponse] = useState()
+
+  useEffect(() => {
+    const handleSettingsRoute = async () => {
+      try {
+        let toSettings = await fetch(`http://localhost:3003/api/settings`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        let res = await toSettings.json();
+        setSettingResponse(res)
+        console.log(res, "res");
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    triggerSettingsRoute && handleSettingsRoute();
+    setTriggerSettingsRoute(false);
+  }, [triggerSettingsRoute]);
+
+  useEffect(() => {
+    settingResponse?.accessGranted && navigate(`/settings`, {
+      state : {
+        userInfo : userInfo
+      }
+    });
+
+  }, [settingResponse])
+  
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -146,10 +182,6 @@ function Home() {
 
   let handleVal = (e) => setVal(e.target.value);
   let handleUpdateVal = (e) => setUpdateInputVal(e.target.value);
-
-  useEffect(() => {
-      
-  }, []);
 
   return (
     <>
@@ -173,7 +205,7 @@ function Home() {
               <div className="dropdown-menu">
                 <div
                   className="dropdown-item"
-                  onClick={() => navigate("/settings")}
+                  onClick={() => setTriggerSettingsRoute(true)}
                 >
                   Settings
                 </div>
