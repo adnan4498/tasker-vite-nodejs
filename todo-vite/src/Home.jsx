@@ -25,8 +25,6 @@ function Home() {
   const location = useLocation();
   let userInfo = location.state?.userInfo;
 
-  console.log(userInfo, "user info");
-
   let handleSubmit = (e) => {
     e.preventDefault();
     if (val.length !== 0) setTodoText(val);
@@ -150,9 +148,8 @@ function Home() {
   let handleUpdateVal = (e) => setUpdateInputVal(e.target.value);
 
   useEffect(() => {
-    
-  }, [])
-  
+      
+  }, []);
 
   return (
     <>

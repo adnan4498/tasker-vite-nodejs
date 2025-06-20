@@ -23,7 +23,6 @@ const Login = () => {
         method: "POST",
         body: JSON.stringify(loginData),
       });
-      console.log(loginUser, "loginUser");
       let res = await loginUser.json();
       setLoginResponse(res);
     };
