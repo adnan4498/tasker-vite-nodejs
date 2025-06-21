@@ -28,7 +28,7 @@ const server = http.createServer((req, res) => {
     res.writeHead(200);
     return res.end();
   }
-
+  
   if (method === "POST" && url === "/api/todos") {
     parsedJSONBody(req)
       .then(({ newTodo, existingTodos }) => {
@@ -96,16 +96,14 @@ const server = http.createServer((req, res) => {
       res.writeHead(400, { "content-type": "application/json" });
       return res.end(JSON.stringify({ error: error }));
     }
-  }
-    else if (method === "POST" && url.includes("login")) {
+  } else if (method === "POST" && url.includes("login")) {
     try {
       auth(req, res);
     } catch (error) {
       res.writeHead(400, { "content-type": "application/json" });
       return res.end(JSON.stringify({ error: error }));
     }
-  }
-  else {
+  } else {
     res.writeHead(404);
     res.end("Not Found");
   }

@@ -30,7 +30,7 @@ export const auth = async function (req, res) {
     if (req.url.includes("login")) {
       if (!findUser) {
         res.writeHead(401, { "content-type": "application/json" });
-        returnres.end(JSON.stringify({ emailNotFound: "user not found" }));
+        return res.end(JSON.stringify({ emailNotFound: "user not found" }));
       }
 
       const match = await bycrypt.compare(password, findUser.password);
