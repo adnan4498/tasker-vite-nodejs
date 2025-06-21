@@ -76,7 +76,7 @@ const Settings = () => {
                     style={{ cursor: "pointer", color: "blue" }}
                     onClick={() => setIsEditEmail(true)}
                   >
-                    edit
+                    edit 
                   </span>
                 </>
               )}
