@@ -23,7 +23,10 @@ const Signup = () => {
           body: JSON.stringify(signUpData),
         });
 
+        console.log(toSingup, "toSingup")
+
         let res = await toSingup.json();
+        console.log(res, "res")
         setSignUpMsg(res);
       } catch (error) {
         console.log(error);
