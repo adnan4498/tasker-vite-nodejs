@@ -23,10 +23,8 @@ const Login = () => {
         method: "POST",
         body: JSON.stringify(loginData),
       });
-      console.log(loginUser, "loginUser");
       let res = await loginUser.json();
       setLoginResponse(res);
-      console.log(res, "res");
     };
 
     triggerSignUpApi && handleSignUpApi();
@@ -35,7 +33,9 @@ const Login = () => {
 
   useEffect(() => {
     if (loginResponse?.status == 200) {
-      navigate("/home");
+      navigate("/home", {
+        state : { userInfo : loginResponse }
+      });
     }
   }, [loginResponse]);
 
@@ -86,7 +86,7 @@ const Login = () => {
             onChange={() => setShowPassword((prev) => !prev)}
           />{" "}
           Show Password
-        </label>
+        </label> 
         <button type="submit">Login</button>
       </form>
     </div>

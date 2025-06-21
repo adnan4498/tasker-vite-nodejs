@@ -2,6 +2,7 @@ import http from "http";
 import { auth } from "../routes/auth.js";
 import { parsedJSONBody } from "../utils/parseJSON.js";
 import mongoose from "mongoose";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const PORT = 3003;
 
@@ -18,11 +19,9 @@ const server = http.createServer((req, res) => {
   console.log(method, "method");
 
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET,POST,PUT,DELETE,OPTIONS,LOGIN,SIGNUP"
-  );
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   if (method === "OPTIONS") {
     res.writeHead(200);
@@ -41,7 +40,6 @@ const server = http.createServer((req, res) => {
           ...existingTodos,
           { id: lastId + 1, todoVal: newTodo },
         ];
-        console.log(newTodos, "newTodos");
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify(newTodos));
       })
@@ -49,7 +47,8 @@ const server = http.createServer((req, res) => {
         res.writeHead(400);
         res.end(JSON.stringify({ error: "Malformed JSON" }));
       });
-  } else if (method === "PUT" && url.includes("update")) {
+  }  
+  else if (method === "PUT" && url.includes("update")) {
     parsedJSONBody(req)
       .then(({ updatedText, existingTodos }) => {
         const todoId = url.split("/").pop();
@@ -63,7 +62,6 @@ const server = http.createServer((req, res) => {
           if (item.id == todoId) item.todoVal = updatedText;
           return item;
         });
-        console.log(updatedTodos, "updatedTodos");
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify(updatedTodos));
       })
@@ -99,6 +97,20 @@ const server = http.createServer((req, res) => {
   } else if (method === "POST" && url.includes("login")) {
     try {
       auth(req, res);
+    } catch (error) {
+      res.writeHead(400, { "content-type": "application/json" });
+      return res.end(JSON.stringify({ error: error }));
+    }
+  } else if (method === "GET" && url.includes("settings")) {
+    try {
+      authMiddleware(req, res, () => {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(
+          JSON.stringify({
+            accessGranted : true,
+          })
+        );
+      });
     } catch (error) {
       res.writeHead(400, { "content-type": "application/json" });
       return res.end(JSON.stringify({ error: error }));

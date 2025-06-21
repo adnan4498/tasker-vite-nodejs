@@ -1,16 +1,15 @@
 import bycrypt from "bcrypt";
 import User from "../models/User.js";
 import { parsedJSONBody } from "../utils/parseJSON.js";
+import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 
 export const auth = async function (req, res) {
+  dotenv.config();
+
   try {
     let body = await parsedJSONBody(req);
     const { name, email, password, confirmPassword } = body;
-
-    // if (!name || !email || !password || !confirmPassword) {
-    //   res.writeHead(400, { "content-type": "application/json" });
-    //   return res.end(JSON.stringify({ error: "Invalid input" }));
-    // }
 
     const findUser = await User.findOne({ email });
 
@@ -42,16 +41,24 @@ export const auth = async function (req, res) {
         );
       }
 
+      let token = jwt.sign({ userId: findUser._id }, process.env.JWT_SECRET, {
+        expiresIn : "12h",
+      })
+
+      console.log(findUser, "findUser")
+
       let loggedInUserData = {
+        id : findUser._id,
         name: findUser.name,
         email: email,
       };
 
       res.writeHead(200, { "content-type": "application/json" });
-      return res.end(JSON.stringify({ status: 200, user: loggedInUserData }));
+      return res.end(JSON.stringify({ status: 200, token, user: loggedInUserData }));
     }
   } catch (error) {
     res.writeHead(400, { "content-type": "application/json" });
     return JSON.stringify({ error: error });
+
   }
 };
