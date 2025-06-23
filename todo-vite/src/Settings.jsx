@@ -27,7 +27,7 @@ const Settings = () => {
     let updateEmail = () => {
       try {
         fetch(`http://localhost:3003/api/emailUpdate/${id}`, {
-
+          
         })
       } catch (error) {
         
