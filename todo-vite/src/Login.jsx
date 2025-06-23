@@ -61,6 +61,11 @@ const Login = () => {
           onChange={handleChange}
           required
         />
+            {loginResponse?.emailNotFound && (
+            <p style={{ color: "red", fontSize: "0.9rem", marginTop: "4px" }}>
+              {loginResponse?.emailNotFound}
+            </p>
+          )}
         <input
           type={showPassword ? "text" : "password"}
           name="password"
