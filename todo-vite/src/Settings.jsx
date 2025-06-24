@@ -9,6 +9,26 @@ const Settings = () => {
   const { name, id, email } = userInfo.user;
   const [editingEmail, setEditingEmail] = useState(email);
   const [isEditEmail, setIsEditEmail] = useState(false);
+  const [triggerEmailFetch, setTriggerEmailFetch] = useState(false);
+
+  useEffect(() => {
+    setIsEditEmail(false);
+    setTriggerEmailFetch(false);
+
+    const updateEmail = async () => {
+      try {
+        await fetch(`http://localhost:3003/api/emailUpdate/${id}`, {
+          headers: { "content-type": "application/json" },
+          method: "POST",
+          body: JSON.stringify({ userId: id, userEmail: email, changedEmail: editingEmail }),
+        }).then((res) => res.json());
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    triggerEmailFetch && updateEmail();
+  }, [triggerEmailFetch]);
 
   const userProfile = {
     name: name,
@@ -18,22 +38,6 @@ const Settings = () => {
 
   const handleEditEmail = (e) => {
     setEditingEmail(e.target.value);
-  };
-
-  const handleSubmitEmail = () => {
-    setIsEditEmail(false);
-
-    let updateEmail = () => {
-      try {
-        fetch(`http://localhost:3003/api/emailUpdate/${id}`, {
-          headers: { "content-type": "application/json" },
-          method: "POST",
-          body: JSON.stringify(signUpData),
-        });
-      } catch (error) {}
-    };
-
-    updateEmail();
   };
 
   const handleCancelEmailEdit = () => {
@@ -71,7 +75,9 @@ const Settings = () => {
                     required
                     autoFocus
                   />
-                  <button onClick={handleSubmitEmail}>Submit</button>
+                  <button onClick={() => setTriggerEmailFetch(true)}>
+                    Submit
+                  </button>
                   <button onClick={handleCancelEmailEdit}>Cancel</button>
                 </div>
               ) : (
@@ -79,7 +85,11 @@ const Settings = () => {
                   {editingEmail}
                   <span
                     className="edit-email"
-                    style={{ cursor: "pointer", color: "blue", paddingLeft : "10px" }}
+                    style={{
+                      cursor: "pointer",
+                      color: "blue",
+                      paddingLeft: "10px",
+                    }}
                     onClick={() => setIsEditEmail(true)}
                   >
                     edit
