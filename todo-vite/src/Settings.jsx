@@ -1,34 +1,57 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./App.css";
+import { Spin } from "antd";
 
 const Settings = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const userInfo = location?.state?.userInfo;
 
   const { name, id, email } = userInfo.user;
   const [editingEmail, setEditingEmail] = useState(email);
   const [isEditEmail, setIsEditEmail] = useState(false);
   const [triggerEmailFetch, setTriggerEmailFetch] = useState(false);
+  const [toOtpPage, setToOtpPage] = useState(null);
 
   useEffect(() => {
-    setIsEditEmail(false);
-    setTriggerEmailFetch(false);
-
     const updateEmail = async () => {
+      setToOtpPage(false);
+
       try {
         await fetch(`http://localhost:3003/api/emailUpdate/${id}`, {
           headers: { "content-type": "application/json" },
           method: "POST",
-          body: JSON.stringify({ userId: id, userEmail: email, changedEmail: editingEmail }),
-        }).then((res) => res.json());
+          body: JSON.stringify({
+            userId: id,
+            userEmail: email,
+            changedEmail: editingEmail,
+          }),
+        })
+          .then((res) => res.json())
+          .then((res) => setToOtpPage(res));
       } catch (err) {
         console.log(err);
       }
     };
 
     triggerEmailFetch && updateEmail();
-  }, [triggerEmailFetch]);
+
+    setIsEditEmail(false);
+    setTriggerEmailFetch(false);
+  }, [triggerEmailFetch, toOtpPage]);
+
+  useEffect(() => {
+    if (toOtpPage?.succeed) {
+      navigate("/OTPValidation",{
+          state: { userId: id },
+        } );
+    } else if (toOtpPage?.error) {
+      alert(toOtpPage.error);
+    }
+  }, [toOtpPage]);
+
+  console.log(toOtpPage, "toOtpPage");
 
   const userProfile = {
     name: name,
@@ -113,6 +136,12 @@ const Settings = () => {
           </div>
         </div>
       </div>
+
+      {toOtpPage == false && (
+        <div>
+          <Spin size="large" />
+        </div>
+      )}
     </div>
   );
 };

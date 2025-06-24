@@ -135,7 +135,7 @@ function Home() {
     handleTodos();
   }, [todoText, todoId, updatingTodo, deleteId]);
 
-  const [settingResponse , setSettingResponse] = useState()
+  const [settingResponse, setSettingResponse] = useState();
 
   useEffect(() => {
     const handleSettingsRoute = async () => {
@@ -149,7 +149,7 @@ function Home() {
         });
 
         let res = await toSettings.json();
-        setSettingResponse(res)
+        setSettingResponse(res);
         console.log(res, "res");
       } catch (error) {
         console.log(error);
@@ -161,14 +161,13 @@ function Home() {
   }, [triggerSettingsRoute]);
 
   useEffect(() => {
-    settingResponse?.accessGranted && navigate(`/settings`, {
-      state : {
-        userInfo : userInfo
-      }
-    });
-
-  }, [settingResponse])
-  
+    settingResponse?.accessGranted &&
+      navigate(`/settings`, {
+        state: {
+          userInfo: userInfo,
+        },
+      });
+  }, [settingResponse]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -182,6 +181,28 @@ function Home() {
 
   let handleVal = (e) => setVal(e.target.value);
   let handleUpdateVal = (e) => setUpdateInputVal(e.target.value);
+
+  // const [toHome, setToHome] = useState(null)
+
+  // useEffect(() => {
+  //   try {
+  //     fetch("http://localhost:3003/justGet", {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //         "Content-Type": "application/json",
+  //       },
+  //       method: "GET",
+  //     }).then(res => res.json()).then(res => setToHome(res));
+  //   } catch (err) {
+  //     setToHome(err)
+  //   }
+  // }, []);
+
+
+  // useEffect(() => {
+  //   if(toHome?.succeed ? navigate("/login") : toHome?.error ? navigate("/home") : "" 
+  // }, [toHome])
+  
 
   return (
     <>

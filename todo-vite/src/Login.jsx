@@ -34,7 +34,7 @@ const Login = () => {
   useEffect(() => {
     if (loginResponse?.status == 200) {
       navigate("/home", {
-        state : { userInfo : loginResponse }
+        state: { userInfo: loginResponse },
       });
     }
   }, [loginResponse]);
@@ -49,6 +49,8 @@ const Login = () => {
     setTriggerSignUpApi(true);
   };
 
+  console.log(loginResponse, "loginResponse")
+
   return (
     <div className="login-div">
       <form onSubmit={handleSubmit} className="login-form">
@@ -61,11 +63,11 @@ const Login = () => {
           onChange={handleChange}
           required
         />
-            {loginResponse?.emailNotFound && (
-            <p style={{ color: "red", fontSize: "0.9rem", marginTop: "4px" }}>
-              {loginResponse?.emailNotFound}
-            </p>
-          )}
+        {loginResponse?.emailNotFound && (
+          <p style={{ color: "red", fontSize: "0.9rem", marginTop: "4px" }}>
+            {loginResponse?.emailNotFound}
+          </p>
+        )}
         <input
           type={showPassword ? "text" : "password"}
           name="password"
@@ -74,11 +76,11 @@ const Login = () => {
           onChange={handleChange}
           required
         />
-           {loginResponse?.incorrectPassword && (
-            <p style={{ color: "red", fontSize: "0.9rem", marginTop: "4px" }}>
-              {loginResponse?.incorrectPassword}
-            </p>
-          )}
+        {loginResponse?.incorrectPassword && (
+          <p style={{ color: "red", fontSize: "0.9rem", marginTop: "4px" }}>
+            {loginResponse?.incorrectPassword}
+          </p>
+        )}
         <label style={{ marginBottom: "1rem" }}>
           <input
             type="checkbox"
@@ -86,7 +88,7 @@ const Login = () => {
             onChange={() => setShowPassword((prev) => !prev)}
           />{" "}
           Show Password
-        </label> 
+        </label>
         <button type="submit">Login</button>
       </form>
     </div>
