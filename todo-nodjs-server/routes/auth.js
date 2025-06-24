@@ -45,8 +45,6 @@ export const auth = async function (req, res) {
         expiresIn : "12h",
       })
 
-      console.log(findUser, "findUser")
-
       let loggedInUserData = {
         id : findUser._id,
         name: findUser.name,

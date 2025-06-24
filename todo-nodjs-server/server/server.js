@@ -3,7 +3,7 @@ import { auth } from "../routes/auth.js";
 import { parsedJSONBody } from "../utils/parseJSON.js";
 import mongoose from "mongoose";
 import { authMiddleware } from "../middleware/authMiddleware.js";
-import { requestEmailChange } from "./OTPEmailChange.js";
+import { requestEmailChange } from "./otpEmailChange.js";
 
 const PORT = 3003;
 
@@ -94,7 +94,14 @@ const server = http.createServer((req, res) => {
       res.writeHead(400, { "content-type": "application/json" });
       return res.end(JSON.stringify({ error: error }));
     }
-  } else if (method === "POST" && url.includes("login")) {
+  } 
+
+  else if (method === "GET" && url.includes("justGet")) {
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify({succeed : "succeed"}))
+  }
+  
+  else if (method === "POST" && url.includes("login")) {
     try {
       auth(req, res);
     } catch (error) {
@@ -116,9 +123,14 @@ const server = http.createServer((req, res) => {
       return res.end(JSON.stringify({ error: error }));
     }
   } else if (method == "POST" && url.includes("emailUpdate")) {
-    parsedJSONBody(req).then(({userId, userEmail, changedEmail}) => {
-      requestEmailChange(userId, userEmail)
-    })
+    parsedJSONBody(req).then(({ userId, userEmail, changedEmail }) => {
+      try {
+        requestEmailChange(userId, userEmail, res);
+      } catch (error) {
+        res.writeHead(400, { "content-type": "application/json" });
+        return res.end(JSON.stringify({ error: error }));
+      }
+    });
   } else {
     res.writeHead(404);
     res.end("Not Found");
@@ -128,4 +140,3 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
- 

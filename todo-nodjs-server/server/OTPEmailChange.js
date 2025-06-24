@@ -114,7 +114,7 @@ const sendOTPEmail = async function (email, otp) {
   }
 };
 
-export const requestEmailChange = async function (userId, email) {
+export const requestEmailChange = async function (userId, email, res) {
   await client.connect();
   const db = client.db(DB_NAME);
   const users = db.collection("users");
@@ -124,5 +124,15 @@ export const requestEmailChange = async function (userId, email) {
 
   const checkOtpSent = await sendOTPEmail(email, otp);
 
-  console.log(checkOtpSent, "otp sent check");
+  try {
+    if (checkOtpSent.accepted.length <= 0) throw new Error("otp email not found");
+
+    res.writeHead(200, { "content-type": "application/json" });
+    return res.end(JSON.stringify({ succeed: "to otp page" }));
+
+    
+
+  } catch (error) {
+    return error;
+  }
 };
