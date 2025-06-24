@@ -27,7 +27,7 @@ const server = http.createServer((req, res) => {
     res.writeHead(200);
     return res.end();
   }
-  
+
   if (method === "POST" && url === "/api/todos") {
     parsedJSONBody(req)
       .then(({ newTodo, existingTodos }) => {
@@ -47,8 +47,7 @@ const server = http.createServer((req, res) => {
         res.writeHead(400);
         res.end(JSON.stringify({ error: "Malformed JSON" }));
       });
-  }  
-  else if (method === "PUT" && url.includes("update")) {
+  } else if (method === "PUT" && url.includes("update")) {
     parsedJSONBody(req)
       .then(({ updatedText, existingTodos }) => {
         const todoId = url.split("/").pop();
@@ -107,7 +106,7 @@ const server = http.createServer((req, res) => {
         res.writeHead(200, { "content-type": "application/json" });
         res.end(
           JSON.stringify({
-            accessGranted : true,
+            accessGranted: true,
           })
         );
       });
@@ -115,6 +114,9 @@ const server = http.createServer((req, res) => {
       res.writeHead(400, { "content-type": "application/json" });
       return res.end(JSON.stringify({ error: error }));
     }
+  } else if (method == "POST" && url.includes("emailUpdate")) {
+    res.writeHead(200, { "content-type": "application/json" });
+    res.end(JSON.stringify({ url: url }));
   } else {
     res.writeHead(404);
     res.end("Not Found");
