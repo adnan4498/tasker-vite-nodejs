@@ -76,6 +76,10 @@
 //   }
 // }
 
+// sendOTPEmail
+// requestEmailChange
+// verifyEmailOTP
+
 import { MongoClient, ObjectId } from "mongodb";
 import nodemailer from "nodemailer";
 
@@ -84,16 +88,41 @@ const DB_NAME = "signup_demo";
 
 const client = new MongoClient(DB_URI);
 
-function generateOTP() {
+const generateOTP = function () {
   return Math.floor(100000 + Math.random() * 900000).toString();
-}
+};
 
-let requestEmailChange = async function () {
+const sendOTPEmail = async function (email, otp) {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "akhan123456008@gmail.com",
+        pass: "svph xiwn mfsu vuka",
+      },
+    });
+
+    return await transporter.sendMail({
+      from: "akhan123456008@gmail.com",
+      to: email,
+      subject: "Your OTP Code",
+      text: `Your OTP is ${otp}. It expires in 10 minutes.`,
+    });
+  } catch (error) {
+    console.error("Failed to send OTP email:", error);
+    throw error;
+  }
+};
+
+export const requestEmailChange = async function (userId, email) {
   await client.connect();
   const db = client.db(DB_NAME);
   const users = db.collection("users");
 
+  const getUser = await users.findOne(new ObjectId(userId));
   let otp = generateOTP();
 
-  
+  const checkOtpSent = await sendOTPEmail(email, otp);
+
+  console.log(checkOtpSent, "otp sent check");
 };

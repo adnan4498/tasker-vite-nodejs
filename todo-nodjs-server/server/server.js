@@ -3,6 +3,7 @@ import { auth } from "../routes/auth.js";
 import { parsedJSONBody } from "../utils/parseJSON.js";
 import mongoose from "mongoose";
 import { authMiddleware } from "../middleware/authMiddleware.js";
+import { requestEmailChange } from "./OTPEmailChange.js";
 
 const PORT = 3003;
 
@@ -115,8 +116,9 @@ const server = http.createServer((req, res) => {
       return res.end(JSON.stringify({ error: error }));
     }
   } else if (method == "POST" && url.includes("emailUpdate")) {
-    res.writeHead(200, { "content-type": "application/json" });
-    res.end(JSON.stringify({ url: url }));
+    parsedJSONBody(req).then(({userId, userEmail, changedEmail}) => {
+      requestEmailChange(userId, userEmail)
+    })
   } else {
     res.writeHead(404);
     res.end("Not Found");
