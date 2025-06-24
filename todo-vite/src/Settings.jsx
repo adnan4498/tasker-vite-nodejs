@@ -21,19 +21,19 @@ const Settings = () => {
   };
 
   const handleSubmitEmail = () => {
-    console.log("Submitted email:", editingEmail);
     setIsEditEmail(false);
 
     let updateEmail = () => {
       try {
         fetch(`http://localhost:3003/api/emailUpdate/${id}`, {
+          headers: { "content-type": "application/json" },
+          method: "POST",
+          body: JSON.stringify(signUpData),
+        });
+      } catch (error) {}
+    };
 
-        })
-      } catch (error) {
-        
-      }
-    }
-    
+    updateEmail();
   };
 
   const handleCancelEmailEdit = () => {
@@ -57,7 +57,13 @@ const Settings = () => {
             <label>Email</label>
             <div>
               {isEditEmail ? (
-                <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "0.5rem",
+                    alignItems: "center",
+                  }}
+                >
                   <input
                     type="email"
                     value={editingEmail}
@@ -70,13 +76,13 @@ const Settings = () => {
                 </div>
               ) : (
                 <>
-                  {editingEmail}{" "}
+                  {editingEmail}
                   <span
                     className="edit-email"
-                    style={{ cursor: "pointer", color: "blue" }}
+                    style={{ cursor: "pointer", color: "blue", paddingLeft : "10px" }}
                     onClick={() => setIsEditEmail(true)}
                   >
-                    edit 
+                    edit
                   </span>
                 </>
               )}
