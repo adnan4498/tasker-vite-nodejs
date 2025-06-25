@@ -1,58 +1,52 @@
-import React, { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 
-const OPTValidaiton = () => {
-  // useEffect(() => {
-  //   const handleSettingsRoute = async () => {
-  //     try {
-  //       let toSettings = await fetch(`http://localhost:3003/api/settings`, {
-  //         method: "GET",
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           "Content-Type": "application/json",
-  //         },
-  //       });
+const OTPValidation = () => {
+  const [otp, setOtp] = useState("");
+  const [isDisable, setIsDisable] = useState(false);
 
-  //       let res = await toSettings.json();
-  //       setSettingResponse(res);
-  //       console.log(res, "res");
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-
-  //   triggerSettingsRoute && handleSettingsRoute();
-  //   setTriggerSettingsRoute(false);
-  // }, [triggerSettingsRoute]);
-
-
-
-
-  let location = useLocation()
-  console.log(location?.state)
-
+  const handleSubmit = (e) => {
+    setOtp(e);
+    setIsDisable(true)
+  };
 
   useEffect(() => {
     try {
       fetch("http://localhost:3003/OTPValidation", {
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         method: "GET",
+        body : JSON.stringify({otpSubmitted: otp}),
+        credentials: "include",
       })
         .then((res) => res.json())
         .then((res) => setToHome(res));
     } catch (err) {
-      setToHome(err);
+      console.log(err);
     }
   }, []);
+  
 
   return (
-    <div>
-      <div>asd</div>
+    <div className="otp-container">
+      <div>
+        <h2>Enter OTP</h2>
+        <input
+          type="text"
+          className="otp-input"
+          value={otp}
+          onChange={(e) => setOtp(e.target.value)}
+          placeholder="Enter OTP"
+          disabled={isDisable}
+        />
+      </div>
+      <div>
+        <button className="otp-button" onClick={() => handleSubmit(otp)}>
+          Submit
+        </button>
+      </div>
     </div>
   );
 };
 
-export default OPTValidaiton;
+export default OTPValidation;

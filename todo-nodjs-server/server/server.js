@@ -3,7 +3,7 @@ import { auth } from "../routes/auth.js";
 import { parsedJSONBody } from "../utils/parseJSON.js";
 import mongoose from "mongoose";
 import { authMiddleware } from "../middleware/authMiddleware.js";
-import { requestEmailChange } from "./OTPEmailChange.js";
+import { requestEmailChange, verifyEmailOTP } from "./OTPEmailChange.js";
 
 const PORT = 3003;
 
@@ -113,23 +113,28 @@ const server = http.createServer((req, res) => {
     }
   } else if (method === "GET" && url.includes("settings")) {
     try {
-      // authMiddleware(req, res, () => {
-      //   res.writeHead(200, { "content-type": "application/json" });
-      //   res.end(
-      //     JSON.stringify({
-      //       accessGranted: true,
-      //     })
-      //   );
-      // });
       authMiddleware(req, res);
     } catch (error) {
       res.writeHead(400, { "content-type": "application/json" });
       return res.end(JSON.stringify({ error: error }));
     }
-  } else if (method == "POST" && url.includes("emailUpdate")) {
-    parsedJSONBody(req).then(({ userId, userEmail, changedEmail }) => {
+  }
+    else if (method === "GET" && url.includes("OTPValidation")) {
+    try {
+      authMiddleware(req, res, () => {
+        parsedJSONBody(req).then(({otpSubmitted}) => {
+          verifyEmailOTP(otpSubmitted)
+        })
+      });
+    } catch (error) {
+      res.writeHead(400, { "content-type": "application/json" });
+      return res.end(JSON.stringify({ error: error }));
+    }
+  } 
+  else if (method == "POST" && url.includes("emailUpdate")) {
+    parsedJSONBody(req).then(({ userId, userEmail, newEmail }) => {
       try {
-        requestEmailChange(userId, userEmail, res);
+        requestEmailChange(userId, userEmail, newEmail, res);
       } catch (error) {
         res.writeHead(400, { "content-type": "application/json" });
         return res.end(JSON.stringify({ error: error }));

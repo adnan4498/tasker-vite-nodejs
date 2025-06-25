@@ -19,13 +19,13 @@ const Settings = () => {
       setToOtpPage(false);
 
       try {
-        await fetch(`http://localhost:3003/api/emailUpdate/${id}`, {
+        await fetch(`http://localhost:3003/api/emailUpdate`, {
           headers: { "content-type": "application/json" },
           method: "POST",
           body: JSON.stringify({
             userId: id,
             userEmail: email,
-            changedEmail: editingEmail,
+            newEmail: editingEmail,
           }),
         })
           .then((res) => res.json())
@@ -43,9 +43,7 @@ const Settings = () => {
 
   useEffect(() => {
     if (toOtpPage?.succeed) {
-      navigate("/OTPValidation",{
-          state: { userId: id },
-        } );
+      navigate("/OTPValidation");
     } else if (toOtpPage?.error) {
       alert(toOtpPage.error);
     }

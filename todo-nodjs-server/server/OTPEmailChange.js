@@ -82,6 +82,7 @@
 
 import { MongoClient, ObjectId } from "mongodb";
 import nodemailer from "nodemailer";
+import User from "../models/User.js";
 
 const DB_URI = "mongodb://localhost:27017";
 const DB_NAME = "signup_demo";
@@ -114,25 +115,40 @@ const sendOTPEmail = async function (email, otp) {
   }
 };
 
-export const requestEmailChange = async function (userId, email, res) {
+export const requestEmailChange = async function (userId, email, newEmail, res) {
   await client.connect();
   const db = client.db(DB_NAME);
   const users = db.collection("users");
 
   const getUser = await users.findOne(new ObjectId(userId));
   let otp = generateOTP();
+  const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
 
   const checkOtpSent = await sendOTPEmail(email, otp);
 
   try {
-    if (checkOtpSent.accepted.length <= 0) throw new Error("otp email not found");
+    if (checkOtpSent.accepted.length <= 0)
+      throw new Error("otp email not found");
 
+    await users.updateOne(
+      { _id: new ObjectId(userId) },
+      {
+        $set: {
+          emailChangeOTP: otp,
+          emailChangeOTPExpiry: otpExpiry,
+          emailChangeTarget: newEmail,
+        },
+      }
+    );
+
+    console.log(getUser, "ggg");
     res.writeHead(200, { "content-type": "application/json" });
     return res.end(JSON.stringify({ succeed: "to otp page" }));
-
-    
-
   } catch (error) {
     return error;
   }
 };
+
+export const verifyEmailOTP = function(otpSubmitted){
+  
+}
