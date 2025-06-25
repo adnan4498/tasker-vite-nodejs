@@ -22,6 +22,7 @@ const Login = () => {
         headers: { "content-type": "application/json" },
         method: "POST",
         body: JSON.stringify(loginData),
+        credentials : "include",
       });
       let res = await loginUser.json();
       setLoginResponse(res);

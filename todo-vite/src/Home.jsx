@@ -23,8 +23,6 @@ function Home() {
   const location = useLocation();
   let userInfo = location.state?.userInfo;
 
-  let token = userInfo.token;
-
   let handleSubmit = (e) => {
     e.preventDefault();
     if (val.length !== 0) setTodoText(val);
@@ -140,12 +138,17 @@ function Home() {
   useEffect(() => {
     const handleSettingsRoute = async () => {
       try {
+        // let toSettings = await fetch(`http://localhost:3003/api/settings`, {
+        //   method: "GET",
+        //   headers: {
+        //     Authorization: `Bearer ${token}`,
+        //     "Content-Type": "application/json",
+        //   },
+        // });
+        
         let toSettings = await fetch(`http://localhost:3003/api/settings`, {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+          credentials: "include", // 🟢 Cookie (token) sent automatically
         });
 
         let res = await toSettings.json();
@@ -198,11 +201,9 @@ function Home() {
   //   }
   // }, []);
 
-
   // useEffect(() => {
-  //   if(toHome?.succeed ? navigate("/login") : toHome?.error ? navigate("/home") : "" 
+  //   if(toHome?.succeed ? navigate("/login") : toHome?.error ? navigate("/home") : ""
   // }, [toHome])
-  
 
   return (
     <>
