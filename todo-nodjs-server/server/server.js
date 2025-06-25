@@ -3,7 +3,7 @@ import { auth } from "../routes/auth.js";
 import { parsedJSONBody } from "../utils/parseJSON.js";
 import mongoose from "mongoose";
 import { authMiddleware } from "../middleware/authMiddleware.js";
-import { requestEmailChange } from "./otpEmailChange.js";
+import { requestEmailChange } from "./OTPEmailChange.js";
 
 const PORT = 3003;
 
@@ -19,14 +19,21 @@ const server = http.createServer((req, res) => {
   console.log(url, "url");
   console.log(method, "method");
 
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   if (method === "OPTIONS") {
-    res.writeHead(200);
-    return res.end();
+    if (req.method === "OPTIONS") {
+      res.writeHead(204, {
+        "Access-Control-Allow-Origin": "http://localhost:5173",
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      });
+      return res.end();
+    }
   }
 
   if (method === "POST" && url === "/api/todos") {
@@ -94,14 +101,10 @@ const server = http.createServer((req, res) => {
       res.writeHead(400, { "content-type": "application/json" });
       return res.end(JSON.stringify({ error: error }));
     }
-  } 
-
-  else if (method === "GET" && url.includes("justGet")) {
-      res.writeHead(200, { "content-type": "application/json" });
-      res.end(JSON.stringify({succeed : "succeed"}))
-  }
-  
-  else if (method === "POST" && url.includes("login")) {
+  } else if (method === "GET" && url.includes("justGet")) {
+    res.writeHead(200, { "content-type": "application/json" });
+    res.end(JSON.stringify({ succeed: "succeed" }));
+  } else if (method === "POST" && url.includes("login")) {
     try {
       auth(req, res);
     } catch (error) {
@@ -110,14 +113,15 @@ const server = http.createServer((req, res) => {
     }
   } else if (method === "GET" && url.includes("settings")) {
     try {
-      authMiddleware(req, res, () => {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(
-          JSON.stringify({
-            accessGranted: true,
-          })
-        );
-      });
+      // authMiddleware(req, res, () => {
+      //   res.writeHead(200, { "content-type": "application/json" });
+      //   res.end(
+      //     JSON.stringify({
+      //       accessGranted: true,
+      //     })
+      //   );
+      // });
+      authMiddleware(req, res);
     } catch (error) {
       res.writeHead(400, { "content-type": "application/json" });
       return res.end(JSON.stringify({ error: error }));

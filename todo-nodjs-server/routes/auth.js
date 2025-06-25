@@ -51,8 +51,11 @@ export const auth = async function (req, res) {
         email: email,
       };
 
-      res.writeHead(200, { "content-type": "application/json" });
-      return res.end(JSON.stringify({ status: 200, token, user: loggedInUserData }));
+       res.writeHead(200, {
+        "Set-Cookie": `token=${token}; HttpOnly; Path=/; Secure; SameSite=Strict`,
+        "Content-Type": "application/json",
+      });
+      return res.end(JSON.stringify({ status: 200, user: loggedInUserData }));
     }
   } catch (error) {
     res.writeHead(400, { "content-type": "application/json" });
