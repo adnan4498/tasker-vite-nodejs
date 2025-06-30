@@ -14,57 +14,59 @@ const Settings = () => {
   const [triggerEmailFetch, setTriggerEmailFetch] = useState(false);
   const [toOtpPage, setToOtpPage] = useState(null);
 
-  useEffect(() => {
-    const updateEmail = async () => {
-      setToOtpPage(false);
 
-      try {
-        await fetch(`http://localhost:3003/api/emailUpdate`, {
-          headers: { "content-type": "application/json" },
-          method: "POST",
-          body: JSON.stringify({
-            userId: id,
-            userEmail: email,
-            newEmail: editingEmail,
-          }),
-        })
-          .then((res) => res.json())
-          .then((res) => setToOtpPage(res));
-      } catch (err) {
-        console.log(err);
-      }
-    };
 
-    triggerEmailFetch && updateEmail();
+  // useEffect(() => {
+  //   const updateEmail = async () => {
+  //     setToOtpPage(false);
 
-    setIsEditEmail(false);
-    setTriggerEmailFetch(false);
-  }, [triggerEmailFetch, toOtpPage]);
+  //     try {
+  //       await fetch(`http://localhost:3003/api/emailUpdate`, {
+  //         headers: { "content-type": "application/json" },
+  //         method: "POST",
+  //         body: JSON.stringify({
+  //           userId: id,
+  //           userEmail: email,
+  //           newEmail: editingEmail,
+  //         }),
+  //       })
+  //         .then((res) => res.json())
+  //         .then((res) => setToOtpPage(res));
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   };
 
-  useEffect(() => {
-    if (toOtpPage?.succeed) {
-      navigate("/OTPValidation");
-    } else if (toOtpPage?.error) {
-      alert(toOtpPage.error);
-    }
-  }, [toOtpPage]);
+  //   triggerEmailFetch && updateEmail();
 
-  console.log(toOtpPage, "toOtpPage");
+  //   setIsEditEmail(false);
+  //   setTriggerEmailFetch(false);
+  // }, [triggerEmailFetch, toOtpPage]);
 
-  const userProfile = {
-    name: name,
-    avatar: "https://i.pravatar.cc/150?img=3",
-    email: email,
-  };
+  // useEffect(() => {
+  //   if (toOtpPage?.succeed) {
+  //     navigate("/OTPValidation");
+  //   } else if (toOtpPage?.error) {
+  //     alert(toOtpPage.error);
+  //   }
+  // }, [toOtpPage]);
 
-  const handleEditEmail = (e) => {
-    setEditingEmail(e.target.value);
-  };
+  // console.log(toOtpPage, "toOtpPage");
 
-  const handleCancelEmailEdit = () => {
-    setEditingEmail(email);
-    setIsEditEmail(false);
-  };
+  // const userProfile = {
+  //   name: name,
+  //   avatar: "https://i.pravatar.cc/150?img=3",
+  //   email: email,
+  // };
+
+  // const handleEditEmail = (e) => {
+  //   setEditingEmail(e.target.value);
+  // };
+
+  // const handleCancelEmailEdit = () => {
+  //   setEditingEmail(email);
+  //   setIsEditEmail(false);
+  // };
 
   return (
     <div className="settings-page">

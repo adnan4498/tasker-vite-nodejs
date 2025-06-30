@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useRef } from "react";
+import { useAuth } from "./contextAPI/AuthContext";
 
 function Home() {
   const [val, setVal] = useState("");
@@ -18,6 +19,7 @@ function Home() {
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef();
+  const { loginInfo } = useAuth();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -184,6 +186,8 @@ function Home() {
 
   let handleVal = (e) => setVal(e.target.value);
   let handleUpdateVal = (e) => setUpdateInputVal(e.target.value);
+
+  console.log(loginInfo, "loginInfo")
 
   // const [toHome, setToHome] = useState(null)
 
