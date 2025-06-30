@@ -14,6 +14,7 @@ const Login = () => {
     password: "",
   });
 
+  const {loginInfo, setLoginInfo} = useAuth()
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,7 +26,7 @@ const Login = () => {
         credentials: "include",
       });
       let res = await loginUser.json();
-      setLoginResponse(res);
+      setLoginInfo(res);
     };
 
     triggerSignUpApi && handleSignUpApi();
@@ -50,7 +51,7 @@ const Login = () => {
     setTriggerSignUpApi(true);
   };
 
-  console.log(loginResponse, "loginResponse")
+  console.log(loginInfo, "loginInfo")
 
   return (
     <div className="login-div">

@@ -8,73 +8,65 @@ const Settings = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { loginInfo, setLoginInfo } = useAuth();
-  // const userInfo = location?.state?.userInfo;
   const userInfo = loginInfo?.user;
 
-  const { name, id, email } = userInfo;
+  const { name, id, email } = userInfo || {}; // add fallback to avoid crash
   const [editingEmail, setEditingEmail] = useState(email);
   const [isEditEmail, setIsEditEmail] = useState(false);
   const [triggerEmailFetch, setTriggerEmailFetch] = useState(false);
   const [toOtpPage, setToOtpPage] = useState(null);
 
-  console.log(loginInfo, "loginInfo in settings");
-
   useEffect(() => {
     const updateEmail = async () => {
       setToOtpPage(false);
 
+      try {
+        const response = await fetch(`http://localhost:3003/api/emailUpdate`, {
+          headers: { "Content-Type": "application/json" },
+          method: "POST",
+          body: JSON.stringify({
+            userId: id,
+            userEmail: email,
+            newEmail: editingEmail,
+          }),
+        });
 
-  // useEffect(() => {
-  //   const updateEmail = async () => {
-  //     setToOtpPage(false);
+        const res = await response.json();
+        setToOtpPage(res);
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
-  //     try {
-  //       await fetch(`http://localhost:3003/api/emailUpdate`, {
-  //         headers: { "content-type": "application/json" },
-  //         method: "POST",
-  //         body: JSON.stringify({
-  //           userId: id,
-  //           userEmail: email,
-  //           newEmail: editingEmail,
-  //         }),
-  //       })
-  //         .then((res) => res.json())
-  //         .then((res) => setToOtpPage(res));
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   };
+    if (triggerEmailFetch) {
+      updateEmail();
+      setIsEditEmail(false);
+      setTriggerEmailFetch(false);
+    }
+  }, [triggerEmailFetch]);
 
-  //   triggerEmailFetch && updateEmail();
+  useEffect(() => {
+    if (toOtpPage?.succeed) {
+      navigate("/OTPValidation");
+    } else if (toOtpPage?.error) {
+      alert(toOtpPage.error);
+    }
+  }, [toOtpPage]);
 
-  //   setIsEditEmail(false);
-  //   setTriggerEmailFetch(false);
-  // }, [triggerEmailFetch, toOtpPage]);
+  const userProfile = {
+    name: name || "Unknown",
+    avatar: "https://i.pravatar.cc/150?img=3",
+    email: email || "Not available",
+  };
 
-  // useEffect(() => {
-  //   if (toOtpPage?.succeed) {
-  //     navigate("/OTPValidation");
-  //   } else if (toOtpPage?.error) {
-  //     alert(toOtpPage.error);
-  //   }
-  // }, [toOtpPage]);
+  const handleEditEmail = (e) => {
+    setEditingEmail(e.target.value);
+  };
 
-  // console.log(toOtpPage, "toOtpPage");
-
-  // const userProfile = {
-  //   name: name,
-  //   avatar: "https://i.pravatar.cc/150?img=3",
-  //   email: email,
-  // };
-
-  // const handleEditEmail = (e) => {
-  //   setEditingEmail(e.target.value);
-  // };
-
-  // const handleCancelEmailEdit = () => {
-  //   setEditingEmail(email);
-  //   setIsEditEmail(false);
-  // };
+  const handleCancelEmailEdit = () => {
+    setEditingEmail(email);
+    setIsEditEmail(false);
+  };
 
   return (
     <div className="settings-page">
@@ -145,8 +137,8 @@ const Settings = () => {
         </div>
       </div>
 
-      {toOtpPage == false && (
-        <div>
+      {toOtpPage === false && (
+        <div style={{ marginTop: "20px", textAlign: "center" }}>
           <Spin size="large" />
         </div>
       )}
