@@ -8,16 +8,16 @@ import OPTValidaiton from "./OPTValidaiton";
 
 const App = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<LoginSignupPage />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/OTPValidation" element={<OPTValidaiton />} />
-      </Routes>
-    </Router>
+      <Router>
+        <Routes>
+          <Route path="/" element={<LoginSignupPage />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/OTPValidation" element={<OPTValidaiton />} />
+        </Routes>
+      </Router>
   );
 };
 

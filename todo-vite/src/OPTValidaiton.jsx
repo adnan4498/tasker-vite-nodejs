@@ -9,22 +9,22 @@ const OTPValidation = () => {
     setIsDisable(true)
   };
 
-  useEffect(() => {
-    try {
-      fetch("http://localhost:3003/OTPValidation", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "GET",
-        body : JSON.stringify({otpSubmitted: otp}),
-        credentials: "include",
-      })
-        .then((res) => res.json())
-        .then((res) => setToHome(res));
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
+  // useEffect(() => {
+  //   try {
+  //     fetch("http://localhost:3003/OTPValidation", {
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       method: "GET",
+  //       body : JSON.stringify({otpSubmitted: otp}),
+  //       credentials: "include",
+  //     })
+  //       .then((res) => res.json())
+  //       .then((res) => setToHome(res));
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // }, []);
   
 
   return (

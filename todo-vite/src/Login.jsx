@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "./contextAPI/AuthContext";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,8 +14,9 @@ const Login = () => {
     password: "",
   });
 
-  const [loginResponse, setLoginResponse] = useState();
   const navigate = useNavigate();
+  const { loginInfo, setLoginInfo } = useAuth();
+
 
   useEffect(() => {
     let handleSignUpApi = async () => {
@@ -22,10 +24,12 @@ const Login = () => {
         headers: { "content-type": "application/json" },
         method: "POST",
         body: JSON.stringify(loginData),
-        credentials : "include",
+        credentials: "include",
       });
       let res = await loginUser.json();
-      setLoginResponse(res);
+      console.log(res, "res in login")
+      // setLoginResponse(res);
+      setLoginInfo(res);
     };
 
     triggerSignUpApi && handleSignUpApi();
@@ -33,12 +37,12 @@ const Login = () => {
   }, [loginData, triggerSignUpApi]);
 
   useEffect(() => {
-    if (loginResponse?.status == 200) {
+    if (loginInfo?.status == 200) {
       navigate("/home", {
-        state: { userInfo: loginResponse },
+        state: { userInfo: loginInfo },
       });
     }
-  }, [loginResponse]);
+  }, [loginInfo]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,7 +54,7 @@ const Login = () => {
     setTriggerSignUpApi(true);
   };
 
-  console.log(loginResponse, "loginResponse")
+  console.log(loginInfo, "loginInfo");
 
   return (
     <div className="login-div">
@@ -64,9 +68,9 @@ const Login = () => {
           onChange={handleChange}
           required
         />
-        {loginResponse?.emailNotFound && (
+        {loginInfo?.emailNotFound && (
           <p style={{ color: "red", fontSize: "0.9rem", marginTop: "4px" }}>
-            {loginResponse?.emailNotFound}
+            {loginInfo?.emailNotFound}
           </p>
         )}
         <input
@@ -77,9 +81,9 @@ const Login = () => {
           onChange={handleChange}
           required
         />
-        {loginResponse?.incorrectPassword && (
+        {loginInfo?.incorrectPassword && (
           <p style={{ color: "red", fontSize: "0.9rem", marginTop: "4px" }}>
-            {loginResponse?.incorrectPassword}
+            {loginInfo?.incorrectPassword}
           </p>
         )}
         <label style={{ marginBottom: "1rem" }}>
