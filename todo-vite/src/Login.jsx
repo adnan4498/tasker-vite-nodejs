@@ -15,15 +15,6 @@ const Login = () => {
   });
 
   const navigate = useNavigate();
-  const { loginInfo ,setLoginInfo } = useAuth();
-
-
-  useEffect(() => {
-    // in login remove all user saved info (credentials)
-    setLoginInfo(null)
-  }, [])
-  
-  console.log(loginInfo, "loginInfo")
 
   useEffect(() => {
     let handleSignUpApi = async () => {
@@ -34,7 +25,7 @@ const Login = () => {
         credentials: "include",
       });
       let res = await loginUser.json();
-      setLoginInfo(res)
+      setLoginResponse(res);
     };
 
     triggerSignUpApi && handleSignUpApi();
@@ -59,8 +50,7 @@ const Login = () => {
     setTriggerSignUpApi(true);
   };
 
-  console.log(loginInfo, "loginInfo");
-
+  console.log(loginResponse, "loginResponse")
 
   return (
     <div className="login-div">

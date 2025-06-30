@@ -1,9 +1,21 @@
-import { createContext, useState, useContext } from "react";
+// AuthContext.jsx
+import { createContext, useContext, useEffect, useState } from "react";
 
-export const AuthContext = createContext(null);
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [loginInfo, setLoginInfo] = useState(null);
+  const [loginInfo, setLoginInfo] = useState(() => {
+    const saved = localStorage.getItem("loginInfo");
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  useEffect(() => {
+    if (loginInfo) {
+      localStorage.setItem("loginInfo", JSON.stringify(loginInfo));
+    } else {
+      localStorage.removeItem("loginInfo");
+    }
+  }, [loginInfo]);
 
   return (
     <AuthContext.Provider value={{ loginInfo, setLoginInfo }}>
@@ -12,5 +24,8 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Optional custom hook
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
+  return context;
+};

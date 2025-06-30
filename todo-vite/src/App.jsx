@@ -9,7 +9,6 @@ import OTPValidation from "./OPTValidaiton";
 
 const App = () => {
   return (
-    <AuthProvider>
       <Router>
         <Routes>
           <Route path="/" element={<LoginSignupPage />} />
@@ -17,10 +16,9 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/home" element={<Home />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/OTPValidation" element={<OTPValidation />} />
+          <Route path="/OTPValidation" element={<OPTValidaiton />} />
         </Routes>
       </Router>
-    </AuthProvider>
   );
 };
 

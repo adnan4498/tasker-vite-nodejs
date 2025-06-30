@@ -152,3 +152,4 @@ export const requestEmailChange = async function (userId, email, newEmail, res) 
 export const verifyEmailOTP = function(otpSubmitted){
   
 }
+ 

@@ -22,8 +22,13 @@ function Home() {
   const { loginInfo } = useAuth();
 
   const navigate = useNavigate();
+  const {loginInfo} = useAuth()
   const location = useLocation();
-  let userInfo = location.state?.userInfo;
+  // let userInfo = location.state?.userInfo;
+  let userInfo = loginInfo?.user
+
+  console.log(userInfo, "userInfo")
+  console.log(loginInfo, "loginInfo")
 
   let handleSubmit = (e) => {
     e.preventDefault();
@@ -222,7 +227,7 @@ function Home() {
               className="user-profile"
               onClick={() => setDropdownOpen(!dropdownOpen)}
             >
-              <span className="profile-name">{userInfo.user.name}</span>
+              <span className="profile-name">{userInfo.name}</span>
               <img
                 src="https://i.pravatar.cc/50?img=12"
                 alt="profile"

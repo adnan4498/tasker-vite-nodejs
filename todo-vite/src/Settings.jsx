@@ -2,18 +2,26 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./App.css";
 import { Spin } from "antd";
+import { useAuth } from "./contextAPI/AuthContext";
 
 const Settings = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const userInfo = location?.state?.userInfo;
+  const { loginInfo, setLoginInfo } = useAuth();
+  // const userInfo = location?.state?.userInfo;
+  const userInfo = loginInfo?.user;
 
-  const { name, id, email } = userInfo.user;
+  const { name, id, email } = userInfo;
   const [editingEmail, setEditingEmail] = useState(email);
   const [isEditEmail, setIsEditEmail] = useState(false);
   const [triggerEmailFetch, setTriggerEmailFetch] = useState(false);
   const [toOtpPage, setToOtpPage] = useState(null);
 
+  console.log(loginInfo, "loginInfo in settings");
+
+  useEffect(() => {
+    const updateEmail = async () => {
+      setToOtpPage(false);
 
 
   // useEffect(() => {
