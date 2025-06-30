@@ -3,7 +3,7 @@ import { auth } from "../routes/auth.js";
 import { parsedJSONBody } from "../utils/parseJSON.js";
 import mongoose from "mongoose";
 import { authMiddleware } from "../middleware/authMiddleware.js";
-import { requestEmailChange, verifyEmailOTP } from "./OTPEmailChange.js";
+import { requestEmailChange, verifyEmailOTP } from "./otpEmailChange.js";
 
 const PORT = 3003;
 
@@ -118,20 +118,15 @@ const server = http.createServer((req, res) => {
       res.writeHead(400, { "content-type": "application/json" });
       return res.end(JSON.stringify({ error: error }));
     }
-  }
-    else if (method === "GET" && url.includes("OTPValidation")) {
+  } else if (method === "GET" && url.includes("OTPValidation")) {
     try {
-      authMiddleware(req, res, () => {
-        parsedJSONBody(req).then(({otpSubmitted}) => {
-          verifyEmailOTP(otpSubmitted)
-        })
-      });
+      let otpSubmitted = url.split("/").pop();
+      verifyEmailOTP(req, otpSubmitted);
     } catch (error) {
       res.writeHead(400, { "content-type": "application/json" });
       return res.end(JSON.stringify({ error: error }));
     }
-  } 
-  else if (method == "POST" && url.includes("emailUpdate")) {
+  } else if (method == "POST" && url.includes("emailUpdate")) {
     parsedJSONBody(req).then(({ userId, userEmail, newEmail }) => {
       try {
         requestEmailChange(userId, userEmail, newEmail, res);
@@ -140,6 +135,12 @@ const server = http.createServer((req, res) => {
         return res.end(JSON.stringify({ error: error }));
       }
     });
+  } else if (method == "POST" && url.includes("logout")) {
+    res.writeHead(200, {
+      "Set-Cookie": `token=${"adnan"}; HttpOnly; Secure; SameSite=Strict; Max-Age=0`,
+      "Content-Type": "application/json",
+    });
+    res.end(JSON.stringify({ message: "Logged out successfully" }));
   } else {
     res.writeHead(404);
     res.end("Not Found");
