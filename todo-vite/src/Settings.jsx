@@ -8,43 +8,42 @@ const Settings = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { loginInfo, setLoginInfo } = useAuth();
-  // const userInfo = location?.state?.userInfo;
   const userInfo = loginInfo?.user;
 
-  const { name, id, email } = userInfo;
+  const { name, id, email } = userInfo || {}; // add fallback to avoid crash
   const [editingEmail, setEditingEmail] = useState(email);
   const [isEditEmail, setIsEditEmail] = useState(false);
   const [triggerEmailFetch, setTriggerEmailFetch] = useState(false);
   const [toOtpPage, setToOtpPage] = useState(null);
-
-  console.log(loginInfo, "loginInfo in settings");
 
   useEffect(() => {
     const updateEmail = async () => {
       setToOtpPage(false);
 
       try {
-        await fetch(`http://localhost:3003/api/emailUpdate`, {
-          headers: { "content-type": "application/json" },
+        const response = await fetch(`http://localhost:3003/api/emailUpdate`, {
+          headers: { "Content-Type": "application/json" },
           method: "POST",
           body: JSON.stringify({
             userId: id,
             userEmail: email,
             newEmail: editingEmail,
           }),
-        })
-          .then((res) => res.json())
-          .then((res) => setToOtpPage(res));
+        });
+
+        const res = await response.json();
+        setToOtpPage(res);
       } catch (err) {
         console.log(err);
       }
     };
 
-    triggerEmailFetch && updateEmail();
-
-    setIsEditEmail(false);
-    setTriggerEmailFetch(false);
-  }, [triggerEmailFetch, toOtpPage]);
+    if (triggerEmailFetch) {
+      updateEmail();
+      setIsEditEmail(false);
+      setTriggerEmailFetch(false);
+    }
+  }, [triggerEmailFetch]);
 
   useEffect(() => {
     if (toOtpPage?.succeed) {
@@ -54,12 +53,10 @@ const Settings = () => {
     }
   }, [toOtpPage]);
 
-  console.log(toOtpPage, "toOtpPage");
-
   const userProfile = {
-    name: name,
+    name: name || "Unknown",
     avatar: "https://i.pravatar.cc/150?img=3",
-    email: email,
+    email: email || "Not available",
   };
 
   const handleEditEmail = (e) => {
@@ -140,8 +137,8 @@ const Settings = () => {
         </div>
       </div>
 
-      {toOtpPage == false && (
-        <div>
+      {toOtpPage === false && (
+        <div style={{ marginTop: "20px", textAlign: "center" }}>
           <Spin size="large" />
         </div>
       )}

@@ -4,7 +4,8 @@ import Signup from "./Signup";
 import LoginSignupPage from "./LoginSignupPage";
 import Login from "./Login";
 import Settings from "./Settings";
-import OPTValidaiton from "./OPTValidaiton";
+import { AuthProvider } from "./contextAPI/AuthContext";
+import OTPValidation from "./OPTValidaiton";
 
 const App = () => {
   return (
@@ -15,7 +16,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/home" element={<Home />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/OTPValidation" element={<OPTValidaiton />} />
+          <Route path="/OTPValidation" element={<OTPValidation />} />
         </Routes>
       </Router>
   );

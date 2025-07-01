@@ -141,7 +141,6 @@ export const requestEmailChange = async function (userId, email, newEmail, res) 
       }
     );
 
-    console.log(getUser, "ggg");
     res.writeHead(200, { "content-type": "application/json" });
     return res.end(JSON.stringify({ succeed: "to otp page" }));
   } catch (error) {
@@ -149,6 +148,8 @@ export const requestEmailChange = async function (userId, email, newEmail, res) 
   }
 };
 
-export const verifyEmailOTP = function(otpSubmitted){
-  
+export const verifyEmailOTP = function(req, otpSubmitted){
+  console.log(req.headers, "red in otp")  
+  console.log(otpSubmitted, "otpSubmitted in otp")
 }
+ 

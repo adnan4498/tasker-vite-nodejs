@@ -310,3 +310,7 @@
 .otp-button:hover {
   background-color: #357ab8;
 }
+
+.otp-container{
+  background-color: darkslategrey;
+}

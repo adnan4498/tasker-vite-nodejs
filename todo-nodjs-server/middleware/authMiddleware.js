@@ -35,7 +35,6 @@ export const authMiddleware = function (req, res, next) {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    // token is valid
     res.writeHead(200, { "Content-Type": "application/json" });
     return res.end(
       JSON.stringify({ accessGranted: true, userId: payload.userId })

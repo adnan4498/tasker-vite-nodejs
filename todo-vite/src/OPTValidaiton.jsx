@@ -3,29 +3,35 @@ import React, { useEffect, useState } from "react";
 const OTPValidation = () => {
   const [otp, setOtp] = useState("");
   const [isDisable, setIsDisable] = useState(false);
+  const [isSendOtp, setIsSentOtp] = useState(false)
 
   const handleSubmit = (e) => {
     setOtp(e);
-    setIsDisable(true)
+    setIsDisable(true);
+    setIsSentOtp(true)
   };
 
-  // useEffect(() => {
-  //   try {
-  //     fetch("http://localhost:3003/OTPValidation", {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       method: "GET",
-  //       body : JSON.stringify({otpSubmitted: otp}),
-  //       credentials: "include",
-  //     })
-  //       .then((res) => res.json())
-  //       .then((res) => setToHome(res));
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // }, []);
-  
+  useEffect(() => {
+    const handleOtpValidation = () => {
+      try {
+        fetch(`http://localhost:3003/OTPValidation/${otp}`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "GET",
+          credentials: "include",
+        })
+          .then((res) => res.json())
+          .then((res) => console.log(res, "res in otp validation"));
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    if(otp.length != 0 && isSendOtp) handleOtpValidation()
+
+    setIsSentOtp(false)
+  }, [isSendOtp]);
 
   return (
     <div className="otp-container">

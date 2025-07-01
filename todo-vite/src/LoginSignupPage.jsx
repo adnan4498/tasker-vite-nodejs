@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./contextAPI/AuthContext";
 // import './LoginSignupPage.css'
@@ -7,7 +7,9 @@ const LoginSignupPage = () => {
   const navigate = useNavigate();
   const { loginInfo, setLoginInfo } = useAuth();
 
-  console.log(loginInfo, "loginInfo in loginSignupPage")
+  console.log(loginInfo, "loginInfo in loginSignupPage");
+
+
 
   return (
     <div className="login-signup-container">
