@@ -4,6 +4,7 @@ import { parsedJSONBody } from "../utils/parseJSON.js";
 import mongoose from "mongoose";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { requestEmailChange, verifyEmailOTP } from "./OTPEmailChange.js";
+import User from "../models/User.js";
 
 const PORT = 3003;
 
@@ -11,6 +12,10 @@ mongoose
   .connect("mongodb://127.0.0.1:27017/signup_demo")
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
+
+User.find().then((users) => {
+  console.log(users, "userssss");
+});
 
 const server = http.createServer((req, res) => {
   const method = req.method;
@@ -118,20 +123,18 @@ const server = http.createServer((req, res) => {
       res.writeHead(400, { "content-type": "application/json" });
       return res.end(JSON.stringify({ error: error }));
     }
-  }
-    else if (method === "GET" && url.includes("OTPValidation")) {
+  } else if (method === "GET" && url.includes("OTPValidation")) {
     try {
       authMiddleware(req, res, () => {
-        parsedJSONBody(req).then(({otpSubmitted}) => {
-          verifyEmailOTP(otpSubmitted)
-        })
+        parsedJSONBody(req).then(({ otpSubmitted }) => {
+          verifyEmailOTP(otpSubmitted);
+        });
       });
     } catch (error) {
       res.writeHead(400, { "content-type": "application/json" });
       return res.end(JSON.stringify({ error: error }));
     }
-  } 
-  else if (method == "POST" && url.includes("emailUpdate")) {
+  } else if (method == "POST" && url.includes("emailUpdate")) {
     parsedJSONBody(req).then(({ userId, userEmail, newEmail }) => {
       try {
         requestEmailChange(userId, userEmail, newEmail, res);
