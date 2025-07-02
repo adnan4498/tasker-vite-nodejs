@@ -1,3 +1,6 @@
+@import "tailwindcss";
+
+
 .todo-parent {
   background-color: lightblue;
 }

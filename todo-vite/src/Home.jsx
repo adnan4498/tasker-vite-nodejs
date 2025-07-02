@@ -22,7 +22,7 @@ function Home() {
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef();
-  const { loginInfo } = useAuth();
+  const { loginInfo, setLoginInfo } = useAuth();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -199,7 +199,10 @@ function Home() {
 
         let res = await loggingOut.json()
         
-        res?.message.includes("successfully") && navigate("/login")
+        if(res?.message.includes("successfully")){
+          setLoginInfo(null)
+          navigate("/login")
+        } 
 
       } catch (error) {
         
@@ -227,7 +230,7 @@ function Home() {
               className="user-profile"
               onClick={() => setDropdownOpen(!dropdownOpen)}
             >
-              <span className="profile-name">{userInfo.name}</span>
+              <span className="profile-name">{userInfo?.name}</span>
               <img
                 src="https://i.pravatar.cc/50?img=12"
                 alt="profile"
