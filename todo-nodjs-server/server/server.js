@@ -137,7 +137,7 @@ const server = http.createServer((req, res) => {
     });
   } else if (method == "POST" && url.includes("logout")) {
     res.writeHead(200, {
-      "Set-Cookie": `token=${"adnan"}; HttpOnly; Secure; SameSite=Strict; Max-Age=0`,
+      "Set-Cookie": `token=; HttpOnly; Secure; SameSite=Strict; Max-Age=0; Path=/`,
       "Content-Type": "application/json",
     });
     res.end(JSON.stringify({ message: "Logged out successfully" }));
