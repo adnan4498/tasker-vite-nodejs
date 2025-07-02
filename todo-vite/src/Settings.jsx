@@ -8,9 +8,17 @@ const Settings = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { loginInfo, setLoginInfo } = useAuth();
-  const userInfo = loginInfo?.user;
+  const [userInfo, setUserInfo] = useState();
 
-  const { name, id, email } = userInfo || {}; // add fallback to avoid crash
+  useEffect(() => {
+    if (loginInfo == undefined || loginInfo == null) {
+      navigate("/");
+    } else {
+      setUserInfo(loginInfo.user);
+    }
+  }, []);
+
+  const { name, id, email } = userInfo || {};
   const [editingEmail, setEditingEmail] = useState(email);
   const [isEditEmail, setIsEditEmail] = useState(false);
   const [triggerEmailFetch, setTriggerEmailFetch] = useState(false);
@@ -54,9 +62,9 @@ const Settings = () => {
   }, [toOtpPage]);
 
   const userProfile = {
-    name: name || "Unknown",
+    name: name,
     avatar: "https://i.pravatar.cc/150?img=3",
-    email: email || "Not available",
+    email: email,
   };
 
   const handleEditEmail = (e) => {
@@ -69,80 +77,84 @@ const Settings = () => {
   };
 
   return (
-    <div className="settings-page">
-      <div className="settings-card">
-        <div className="settings-header">
-          <img
-            src={userProfile.avatar}
-            alt="Avatar"
-            className="settings-avatar"
-          />
-          <h2 className="settings-name">{userProfile.name}</h2>
-        </div>
-        <div className="settings-section">
-          <div className="settings-item">
-            <label>Email</label>
-            <div>
-              {isEditEmail ? (
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "0.5rem",
-                    alignItems: "center",
-                  }}
-                >
-                  <input
-                    type="email"
-                    value={editingEmail}
-                    onChange={handleEditEmail}
-                    required
-                    autoFocus
-                  />
-                  <button onClick={() => setTriggerEmailFetch(true)}>
-                    Submit
-                  </button>
-                  <button onClick={handleCancelEmailEdit}>Cancel</button>
+    <>
+      {userInfo && (
+        <div className="settings-page">
+          <div className="settings-card">
+            <div className="settings-header">
+              <img
+                src={userProfile.avatar}
+                alt="Avatar"
+                className="settings-avatar"
+              />
+              <h2 className="settings-name">{userProfile.name}</h2>
+            </div>
+            <div className="settings-section">
+              <div className="settings-item">
+                <label>Email</label>
+                <div>
+                  {isEditEmail ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        alignItems: "center",
+                      }}
+                    >
+                      <input
+                        type="email"
+                        value={editingEmail}
+                        onChange={handleEditEmail}
+                        required
+                        autoFocus
+                      />
+                      <button onClick={() => setTriggerEmailFetch(true)}>
+                        Submit
+                      </button>
+                      <button onClick={handleCancelEmailEdit}>Cancel</button>
+                    </div>
+                  ) : (
+                    <>
+                      {editingEmail}
+                      <span
+                        className="edit-email"
+                        style={{
+                          cursor: "pointer",
+                          color: "blue",
+                          paddingLeft: "10px",
+                        }}
+                        onClick={() => setIsEditEmail(true)}
+                      >
+                        edit
+                      </span>
+                    </>
+                  )}
                 </div>
-              ) : (
-                <>
-                  {editingEmail}
-                  <span
-                    className="edit-email"
-                    style={{
-                      cursor: "pointer",
-                      color: "blue",
-                      paddingLeft: "10px",
-                    }}
-                    onClick={() => setIsEditEmail(true)}
-                  >
-                    edit
-                  </span>
-                </>
-              )}
+              </div>
+
+              <div className="settings-item">
+                <label>Notifications</label>
+                <span>Enabled</span>
+              </div>
+              <div className="settings-item">
+                <label>Change Password</label>
+                <span>********</span>
+              </div>
+              <div className="settings-item">
+                <label>Theme</label>
+                <span>Light</span>
+              </div>
             </div>
           </div>
 
-          <div className="settings-item">
-            <label>Notifications</label>
-            <span>Enabled</span>
-          </div>
-          <div className="settings-item">
-            <label>Change Password</label>
-            <span>********</span>
-          </div>
-          <div className="settings-item">
-            <label>Theme</label>
-            <span>Light</span>
-          </div>
-        </div>
-      </div>
-
-      {toOtpPage === false && (
-        <div style={{ marginTop: "20px", textAlign: "center" }}>
-          <Spin size="large" />
+          {toOtpPage === false && (
+            <div style={{ marginTop: "20px", textAlign: "center" }}>
+              <Spin size="large" />
+            </div>
+          )}
         </div>
       )}
-    </div>
+    </>
   );
 };
 

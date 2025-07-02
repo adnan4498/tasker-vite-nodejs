@@ -195,6 +195,7 @@ function Home() {
         let loggingOut = await fetch(`http://localhost:3003/api/logout`, {
           headers : {"content-type" : "application/json" },
           method : "POST",
+          credentials : "include"
         })
 
         let res = await loggingOut.json()
@@ -204,8 +205,8 @@ function Home() {
           navigate("/login")
         } 
 
-      } catch (error) {
-        
+      } catch (err) {
+        console.log(err)
       }
     }
 
