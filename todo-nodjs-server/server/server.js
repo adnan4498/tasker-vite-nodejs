@@ -3,12 +3,7 @@ import { auth } from "../routes/auth.js";
 import { parsedJSONBody } from "../utils/parseJSON.js";
 import mongoose from "mongoose";
 import { authMiddleware } from "../middleware/authMiddleware.js";
-<<<<<<< HEAD
-import { requestEmailChange, verifyEmailOTP } from "./OTPEmailChange.js";
-import User from "../models/User.js";
-=======
 import { requestEmailChange, verifyEmailOTP } from "./otpEmailChange.js";
->>>>>>> 088c384218f7c50e770d42165a06fb045e6ade92
 
 const PORT = 3003;
 
@@ -16,10 +11,6 @@ mongoose
   .connect("mongodb://127.0.0.1:27017/signup_demo")
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
-
-User.find().then((users) => {
-  console.log(users, "userssss");
-});
 
 const server = http.createServer((req, res) => {
   const method = req.method;
@@ -129,16 +120,8 @@ const server = http.createServer((req, res) => {
     }
   } else if (method === "GET" && url.includes("OTPValidation")) {
     try {
-<<<<<<< HEAD
-      authMiddleware(req, res, () => {
-        parsedJSONBody(req).then(({ otpSubmitted }) => {
-          verifyEmailOTP(otpSubmitted);
-        });
-      });
-=======
       let otpSubmitted = url.split("/").pop();
       verifyEmailOTP(req, otpSubmitted);
->>>>>>> 088c384218f7c50e770d42165a06fb045e6ade92
     } catch (error) {
       res.writeHead(400, { "content-type": "application/json" });
       return res.end(JSON.stringify({ error: error }));
