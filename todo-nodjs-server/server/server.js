@@ -101,9 +101,6 @@ const server = http.createServer((req, res) => {
       res.writeHead(400, { "content-type": "application/json" });
       return res.end(JSON.stringify({ error: error }));
     }
-  } else if (method === "GET" && url.includes("justGet")) {
-    res.writeHead(200, { "content-type": "application/json" });
-    res.end(JSON.stringify({ succeed: "succeed" }));
   } else if (method === "POST" && url.includes("login")) {
     try {
       auth(req, res);
@@ -111,7 +108,11 @@ const server = http.createServer((req, res) => {
       res.writeHead(400, { "content-type": "application/json" });
       return res.end(JSON.stringify({ error: error }));
     }
-  } else if (method === "GET" && url.includes("settings")) {
+  } 
+    else if (method == "GET" && url.includes("")){
+
+    }
+  else if (method === "GET" && url.includes("settings")) {
     try {
       authMiddleware(req, res);
     } catch (error) {

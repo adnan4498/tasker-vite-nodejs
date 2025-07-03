@@ -11,10 +11,10 @@ export const auth = async function (req, res) {
     let body = await parsedJSONBody(req);
     const { name, email, password, confirmPassword } = body;
 
-    const findUser = await User.findOne({ email });
+    const user = await User.findOne({ email });
 
     if (req.url.includes("signup")) {
-      if (findUser) {
+      if (user) {
         res.writeHead(409);
         return res.end(JSON.stringify({ error: "User already exists" }));
       }
@@ -27,12 +27,12 @@ export const auth = async function (req, res) {
     }
 
     if (req.url.includes("login")) {
-      if (!findUser) {
+      if (!user) {
         res.writeHead(401, { "content-type": "application/json" });
         return res.end(JSON.stringify({ emailNotFound: "user not found" }));
       }
 
-      const match = await bycrypt.compare(password, findUser.password);
+      const match = await bycrypt.compare(password, user.password);
 
       if (!match) {
         res.writeHead(401, { "content-type": "application/json" });
@@ -41,13 +41,13 @@ export const auth = async function (req, res) {
         );
       }
 
-      let token = jwt.sign({ userId: findUser._id }, process.env.JWT_SECRET, {
+      let token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
         expiresIn : "12h",
       })
 
       let loggedInUserData = {
-        id : findUser._id,
-        name: findUser.name,
+        id : user._id,
+        name: user.name,
         email: email,
       };
 
@@ -56,7 +56,7 @@ export const auth = async function (req, res) {
         "Content-Type": "application/json",
       }
     );
-      return res.end(JSON.stringify({ status: 200, user: loggedInUserData }));
+      return res.end(JSON.stringify({ accessGranted : true, user: loggedInUserData }));
     }
   } catch (error) {
     res.writeHead(400, { "content-type": "application/json" });
