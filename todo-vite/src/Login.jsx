@@ -27,19 +27,12 @@ const Login = () => {
       });
       let res = await loginUser.json();
       setLoginInfo(res);
+      res?.accessGranted && navigate("/home")
     };
 
     triggerSignUpApi && handleSignUpApi();
     setTriggerSignUpApi(false);
   }, [loginData, triggerSignUpApi]);
-
-  useEffect(() => {
-    if (loginInfo?.status == 200) {
-      navigate("/home", {
-        state: { userInfo: loginInfo },
-      });
-    }
-  }, [loginInfo]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

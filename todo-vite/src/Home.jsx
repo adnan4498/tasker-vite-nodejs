@@ -3,6 +3,7 @@ import "./App.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useRef } from "react";
 import { useAuth } from "./contextAPI/AuthContext";
+import { Spin } from "antd";
 
 function Home() {
   const [val, setVal] = useState("");
@@ -18,19 +19,16 @@ function Home() {
   const [settingResponse, setSettingResponse] = useState();
   const [triggerSettingsRoute, setTriggerSettingsRoute] = useState();
 
-  const [isLoggedOut, setIsLoggedOut] = useState(false)
+  const [isLoggedOut, setIsLoggedOut] = useState(false);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef();
   const { loginInfo, setLoginInfo } = useAuth();
 
   const navigate = useNavigate();
-  const location = useLocation();
-  // let userInfo = location.state?.userInfo;
-  let userInfo = loginInfo?.user
+  let userInfo = loginInfo?.user;
 
-  console.log(userInfo, "userInfo")
-  console.log(loginInfo, "loginInfo")
+  console.log(userInfo, "userInfo");
 
   let handleSubmit = (e) => {
     e.preventDefault();
@@ -54,6 +52,17 @@ function Home() {
     setDeleteId(id);
     setIsDelete(true);
   };
+
+  useEffect(() => {
+    const handleVerifyUser = async () => {
+      try {
+        let verifyUser = await fetch(`http://localhost:3003/check`)
+      } catch (error) {
+        
+      } 
+
+    }
+  }, []);
 
   // Crud operations
   useEffect(() => {
@@ -152,10 +161,10 @@ function Home() {
         //     "Content-Type": "application/json",
         //   },
         // });
-        
+
         let toSettings = await fetch(`http://localhost:3003/api/settings`, {
           method: "GET",
-          credentials: "include", // 🟢 Cookie (token) sent automatically
+          credentials: "include",
         });
 
         let res = await toSettings.json();
@@ -171,12 +180,13 @@ function Home() {
   }, [triggerSettingsRoute]);
 
   useEffect(() => {
-    settingResponse?.accessGranted &&
+    if (settingResponse?.accessGranted) {
       navigate(`/settings`, {
         state: {
           userInfo: userInfo,
         },
       });
+    }
   }, [settingResponse]);
 
   useEffect(() => {
@@ -190,114 +200,124 @@ function Home() {
   }, []);
 
   useEffect(() => {
-    const handleLogOut  = async () => {
+    const handleLogOut = async () => {
       try {
         let loggingOut = await fetch(`http://localhost:3003/api/logout`, {
-          headers : {"content-type" : "application/json" },
-          method : "POST",
-          credentials : "include"
-        })
+          headers: { "content-type": "application/json" },
+          method: "POST",
+          credentials: "include",
+        });
 
-        let res = await loggingOut.json()
-        
-        if(res?.message.includes("successfully")){
-          setLoginInfo(null)
-          navigate("/login")
-        } 
+        let res = await loggingOut.json();
 
+        if (res?.message.includes("successfully")) {
+          setLoginInfo(null);
+          navigate("/login");
+        }
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
-    }
+    };
 
-    isLoggedOut && handleLogOut()
-    setIsLoggedOut(false)
-  }, [isLoggedOut])
-  
+    isLoggedOut && handleLogOut();
+    setIsLoggedOut(false);
+  }, [isLoggedOut]);
 
   let handleVal = (e) => setVal(e.target.value);
   let handleUpdateVal = (e) => setUpdateInputVal(e.target.value);
 
-  console.log(loginInfo, "loginInfo")
+  console.log(loginInfo, "loginInfo");
 
   return (
     <>
-      <div className="main-container">
-        <div className="navbar">
-          <div className="hello">Hello</div>
+      {!loginInfo?.accessGranted ? (
+        <Spin />
+      ) : (
+        <div className="main-container">
+          <div className="navbar">
+            <div className="hello">Hello</div>
 
-          <div className="user-profile-container" ref={dropdownRef}>
-            <div
-              className="user-profile"
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-            >
-              <span className="profile-name">{userInfo?.name}</span>
-              <img
-                src="https://i.pravatar.cc/50?img=12"
-                alt="profile"
-                className="profile-pic"
-              />
-            </div>
-            {dropdownOpen && (
-              <div className="dropdown-menu">
-                <div
-                  className="dropdown-item"
-                  onClick={() => setTriggerSettingsRoute(true)}
-                >
-                  Settings
-                </div>
-                <div className="dropdown-item" onClick={() => setIsLoggedOut(true)}>Logout</div>
+            <div className="user-profile-container" ref={dropdownRef}>
+              <div
+                className="user-profile"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+              >
+                <span className="profile-name">{userInfo?.name}</span>
+                <img
+                  src="https://i.pravatar.cc/50?img=12"
+                  alt="profile"
+                  className="profile-pic"
+                />
               </div>
-            )}
-          </div>
-        </div>
-
-        <div className="add-new-todo">
-          <form>
-            <label className="new-todo">New Todo</label>
-            <input type="text" value={val} onChange={handleVal} />
-            <input type="submit" value="Submit" onClick={handleSubmit} />
-          </form>
-        </div>
-
-        <div className="todo-container">
-          {todos?.map((item) => (
-            <div key={item.id} className="todo-parent">
-              <div>
-                {isUpdate && todoId === item.id ? (
-                  <>
-                    <input
-                      type="text"
-                      value={updateInputVal}
-                      onChange={handleUpdateVal}
-                    />
-                    <input
-                      type="submit"
-                      value="Submit"
-                      onClick={handleSubmitUpdate}
-                    />
-                  </>
-                ) : (
-                  <div className="todo-name">{item.todoVal}</div>
-                )}
-
-                <div className="todo-btns">
-                  <div className="completed-btn">completed</div>
-                  <div className="update-btn" onClick={() => handleId(item.id)}>
-                    update
+              {dropdownOpen && (
+                <div className="dropdown-menu">
+                  <div
+                    className="dropdown-item"
+                    onClick={() => setTriggerSettingsRoute(true)}
+                  >
+                    Settings
                   </div>
                   <div
-                    className="delete-btn"
-                    onClick={() => handleDelete(item.id)}
+                    className="dropdown-item"
+                    onClick={() => setIsLoggedOut(true)}
                   >
-                    delete
+                    Logout
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="add-new-todo">
+            <form>
+              <label className="new-todo">New Todo</label>
+              <input type="text" value={val} onChange={handleVal} />
+              <input type="submit" value="Submit" onClick={handleSubmit} />
+            </form>
+          </div>
+
+          <div className="todo-container">
+            {todos?.map((item) => (
+              <div key={item.id} className="todo-parent">
+                <div>
+                  {isUpdate && todoId === item.id ? (
+                    <>
+                      <input
+                        type="text"
+                        value={updateInputVal}
+                        onChange={handleUpdateVal}
+                      />
+                      <input
+                        type="submit"
+                        value="Submit"
+                        onClick={handleSubmitUpdate}
+                      />
+                    </>
+                  ) : (
+                    <div className="todo-name">{item.todoVal}</div>
+                  )}
+
+                  <div className="todo-btns">
+                    <div className="completed-btn">completed</div>
+                    <div
+                      className="update-btn"
+                      onClick={() => handleId(item.id)}
+                    >
+                      update
+                    </div>
+                    <div
+                      className="delete-btn"
+                      onClick={() => handleDelete(item.id)}
+                    >
+                      delete
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

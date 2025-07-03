@@ -78,7 +78,9 @@ const Settings = () => {
 
   return (
     <>
-      {userInfo && (
+      {!userInfo ? (
+        <Spin />
+      ) : (
         <div className="settings-page">
           <div className="settings-card">
             <div className="settings-header">
